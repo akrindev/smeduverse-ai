@@ -36,8 +36,8 @@ export type MessageProps = HTMLAttributes<HTMLDivElement> & {
 export const Message = ({ className, from, ...props }: MessageProps) => (
 	<div
 		className={cn(
-			"group flex w-full max-w-[80%] flex-col gap-2",
-			from === "user" ? "is-user ml-auto justify-end" : "is-assistant",
+			"smeduverse-message",
+			from === "user" ? "user" : "assistant",
 			className,
 		)}
 		{...props}
@@ -51,15 +51,7 @@ export const MessageContent = ({
 	className,
 	...props
 }: MessageContentProps) => (
-	<div
-		className={cn(
-			"is-user:dark flex w-fit flex-col gap-2 overflow-hidden text-sm",
-			"group-[.is-user]:ml-auto group-[.is-user]:rounded-lg group-[.is-user]:text-foreground",
-			"group-[.is-assistant]:text-foreground",
-			className,
-		)}
-		{...props}
-	>
+	<div className={cn("smeduverse-message-content", className)} {...props}>
 		{children}
 	</div>
 );
@@ -235,7 +227,7 @@ export const MessageBranchSelector = ({
 
 	return (
 		<ButtonGroup
-			className="[&>*:not(:first-child)]:rounded-l-md [&>*:not(:last-child)]:rounded-r-md"
+			className="smeduverse-button-group"
 			orientation="horizontal"
 			{...props}
 		/>

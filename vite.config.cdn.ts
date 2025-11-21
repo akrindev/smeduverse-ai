@@ -1,4 +1,3 @@
-import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 import { defineConfig } from "vite";
@@ -15,7 +14,8 @@ export default defineConfig({
 				plugins: [],
 			},
 		}),
-		tailwindcss(),
+		// Note: TailwindCSS excluded for CDN build - using standard CSS instead
+		// tailwindcss(),
 	],
 	define: {
 		// Polyfill process for browser environment (required by some dependencies)

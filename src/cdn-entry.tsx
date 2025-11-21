@@ -7,8 +7,16 @@
 import { StrictMode } from "react";
 import type { Root } from "react-dom/client";
 import { createRoot } from "react-dom/client";
+// Import CSS using raw import for CDN build
+import cssContent from "./cdn-styles.css?raw";
 import { SmeduverseAIWidget } from "./components/SmeduverseAIWidget.cdn";
-import "./index.css";
+
+// Inject CSS into document head
+if (typeof document !== "undefined") {
+	const styleElement = document.createElement("style");
+	styleElement.textContent = cssContent;
+	document.head.appendChild(styleElement);
+}
 
 // Widget configuration interface
 export interface SmeduverseAIConfig {

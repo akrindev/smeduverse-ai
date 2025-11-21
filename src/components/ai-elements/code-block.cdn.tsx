@@ -39,25 +39,13 @@ export const CodeBlock = ({
 }: CodeBlockProps) => {
 	return (
 		<CodeBlockContext.Provider value={{ code }}>
-			<div
-				className={cn(
-					"group relative w-full overflow-hidden rounded-md border bg-background text-foreground",
-					className,
-				)}
-				{...props}
-			>
-				<div className="relative">
-					<div className="overflow-hidden [&>pre]:m-0 [&>pre]:bg-background! [&>pre]:p-4 [&>pre]:text-foreground! [&>pre]:text-sm [&_code]:font-mono [&_code]:text-sm">
-						<pre>
-							<code className={`language-${language}`}>{code}</code>
-						</pre>
-					</div>
-					{children && (
-						<div className="absolute top-2 right-2 flex items-center gap-2">
-							{children}
-						</div>
-					)}
+			<div className={cn("smeduverse-code-block", className)} {...props}>
+				<div className="smeduverse-code-content">
+					<pre>
+						<code className={`language-${language}`}>{code}</code>
+					</pre>
 				</div>
+				{children && <div className="smeduverse-code-actions">{children}</div>}
 			</div>
 		</CodeBlockContext.Provider>
 	);
@@ -100,7 +88,7 @@ export const CodeBlockCopyButton = ({
 
 	return (
 		<Button
-			className={cn("shrink-0", className)}
+			className={cn("smeduverse-button-shrink", className)}
 			onClick={copyToClipboard}
 			size="icon"
 			variant="ghost"

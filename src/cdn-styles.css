@@ -1,0 +1,988 @@
+/* CDN-Compatible CSS for SMEduverse AI Widget */
+/* This CSS uses standard syntax compatible with CDN deployment */
+/* No build-time processing required - works in plain HTML */
+
+/* Reset and Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+/* Design System Variables */
+:root {
+  /* Radius Variables */
+  --radius: 0.625rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Color Variables */
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-card: #ffffff;
+  --color-card-foreground: #0a0a0a;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0a0a0a;
+  --color-primary: #171717;
+  --color-primary-foreground: #fafafa;
+  --color-secondary: #f5f5f5;
+  --color-secondary-foreground: #171717;
+  --color-muted: #f5f5f5;
+  --color-muted-foreground: #737373;
+  --color-accent: #f5f5f5;
+  --color-accent-foreground: #171717;
+  --color-destructive: #dc2626;
+  --color-border: #e5e5e5;
+  --color-input: #e5e5e5;
+  --color-ring: #a1a1aa;
+  --color-chart-1: #8884d8;
+  --color-chart-2: #82ca9d;
+  --color-chart-3: #ffc658;
+  --color-chart-4: #ff7c7c;
+  --color-chart-5: #8dd1e1;
+  --color-sidebar: #fafafa;
+  --color-sidebar-foreground: #0a0a0a;
+  --color-sidebar-primary: #171717;
+  --color-sidebar-primary-foreground: #fafafa;
+  --color-sidebar-accent: #f5f5f5;
+  --color-sidebar-accent-foreground: #171717;
+  --color-sidebar-border: #e5e5e5;
+  --color-sidebar-ring: #a1a1aa;
+}
+
+/* Dark Theme */
+.dark {
+  --color-background: #0a0a0a;
+  --color-foreground: #fafafa;
+  --color-card: #171717;
+  --color-card-foreground: #fafafa;
+  --color-popover: #171717;
+  --color-popover-foreground: #fafafa;
+  --color-primary: #e5e5e5;
+  --color-primary-foreground: #171717;
+  --color-secondary: #262626;
+  --color-secondary-foreground: #fafafa;
+  --color-muted: #262626;
+  --color-muted-foreground: #a1a1aa;
+  --color-accent: #262626;
+  --color-accent-foreground: #fafafa;
+  --color-destructive: #ef4444;
+  --color-border: #ffffff1a;
+  --color-input: #ffffff26;
+  --color-ring: #71717a;
+  --color-chart-1: #8884d8;
+  --color-chart-2: #82ca9d;
+  --color-chart-3: #ffc658;
+  --color-chart-4: #ff7c7c;
+  --color-chart-5: #8dd1e1;
+  --color-sidebar: #171717;
+  --color-sidebar-foreground: #fafafa;
+  --color-sidebar-primary: #8884d8;
+  --color-sidebar-primary-foreground: #fafafa;
+  --color-sidebar-accent: #262626;
+  --color-sidebar-accent-foreground: #fafafa;
+  --color-sidebar-border: #ffffff1a;
+  --color-sidebar-ring: #71717a;
+}
+
+/* Core Utility Classes for CDN */
+.smeduverse-widget {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: fixed;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.smeduverse-widget.bottom-right {
+  bottom: 1.5rem;
+  right: 1.5rem;
+  align-items: flex-end;
+}
+
+.smeduverse-widget.bottom-left {
+  bottom: 1.5rem;
+  left: 1.5rem;
+  align-items: flex-start;
+}
+
+.smeduverse-widget.bottom-center {
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+}
+
+/* Chat Window Styles */
+.smeduverse-chat-window {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 8rem);
+  transition: all 300ms ease-in-out;
+  origin: bottom right;
+}
+
+.smeduverse-chat-window.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.smeduverse-chat-window.closed {
+  opacity: 0;
+  transform: translateY(1rem) scale(0.95);
+  pointer-events: none;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* Header Styles */
+.smeduverse-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-secondary);
+  background: rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(8px);
+}
+
+.smeduverse-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.smeduverse-avatar {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  background: color-mix(in oklab, var(--color-primary), transparent 90%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-primary);
+  border-color: color-mix(in oklab, var(--color-primary), transparent 80%);
+}
+
+.smeduverse-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--color-foreground);
+}
+
+.smeduverse-status {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}
+
+.smeduverse-status-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.smeduverse-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.smeduverse-header-button {
+  padding: 0.5rem;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.smeduverse-header-button:hover {
+  background: var(--color-secondary);
+  color: var(--color-foreground);
+}
+
+.smeduverse-header-button.danger:hover {
+  background: var(--color-destructive);
+  background: color-mix(in oklab, var(--color-destructive), transparent 90%);
+  color: var(--color-destructive);
+}
+
+/* Messages Area */
+.smeduverse-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--color-background);
+  background: color-mix(in oklab, var(--color-background), transparent 50%);
+}
+
+.smeduverse-welcome {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-muted-foreground);
+  gap: 1rem;
+}
+
+.smeduverse-welcome-icon {
+  height: 4rem;
+  width: 4rem;
+  border-radius: 1.5rem;
+  background: var(--color-secondary);
+  background: color-mix(in oklab, var(--color-secondary), transparent 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.smeduverse-welcome h4 {
+  font-weight: 500;
+  color: var(--color-foreground);
+  margin-bottom: 0.25rem;
+}
+
+.smeduverse-welcome p {
+  font-size: 0.875rem;
+  max-width: 15rem;
+  margin: 0 auto;
+}
+
+.smeduverse-suggestions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 15rem;
+  font-size: 0.75rem;
+}
+
+.smeduverse-suggestion {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  cursor: pointer;
+  transition: all 150ms;
+  text-align: left;
+}
+
+.smeduverse-suggestion:hover {
+  background: var(--color-secondary);
+  background: color-mix(in oklab, var(--color-secondary), transparent 50%);
+}
+
+/* Message Styles */
+.smeduverse-message {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 90%;
+}
+
+.smeduverse-message.user {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.smeduverse-message.assistant {
+  align-items: flex-start;
+}
+
+.smeduverse-message-content {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 100%;
+}
+
+.smeduverse-message.user .smeduverse-message-content {
+  margin-left: auto;
+  flex-direction: row-reverse;
+}
+
+.smeduverse-message-avatar {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid;
+}
+
+.smeduverse-message.user .smeduverse-message-avatar {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  border-color: var(--color-primary);
+}
+
+.smeduverse-message.assistant .smeduverse-message-avatar {
+  background: var(--color-secondary);
+  color: var(--color-secondary-foreground);
+  border-color: var(--color-border);
+}
+
+.smeduverse-message-bubble {
+  padding: 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  word-wrap: break-word;
+}
+
+.smeduverse-message.user .smeduverse-message-bubble {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  border-top-right-radius: 0.25rem;
+}
+
+.smeduverse-message.assistant .smeduverse-message-bubble {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-top-left-radius: 0.25rem;
+}
+
+/* Loading Animation */
+.smeduverse-loading {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 85%;
+}
+
+.smeduverse-loading-avatar {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 50%;
+  background: var(--color-secondary);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.smeduverse-loading-dots {
+  padding: 0.75rem;
+  border-radius: 1rem;
+  border-top-left-radius: 0.25rem;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  font-size: 0.875rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.smeduverse-loading-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: var(--color-muted-foreground);
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.smeduverse-loading-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.smeduverse-loading-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* Input Area */
+.smeduverse-input {
+  padding: 1rem;
+  background: var(--color-card);
+  border-top: 1px solid var(--color-border);
+}
+
+.smeduverse-input-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.smeduverse-input-clear {
+  padding: 0.625rem;
+  color: var(--color-muted-foreground);
+  background: transparent;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.smeduverse-input-clear:hover {
+  color: var(--color-foreground);
+  background: var(--color-secondary);
+}
+
+.smeduverse-input-field {
+  flex: 1;
+  position: relative;
+}
+
+.smeduverse-input-text {
+  width: 100%;
+  /* background: var(--color-secondary); */
+  background: color-mix(in oklab, var(--color-secondary), transparent 50%);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 0.625rem 2.5rem 0.625rem 1rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 150ms;
+}
+
+.smeduverse-input-text:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-primary), transparent 80%);
+}
+
+.smeduverse-input-text::placeholder {
+  color: var(--color-muted-foreground);
+}
+
+.smeduverse-input-send {
+  padding: 0.625rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.smeduverse-input-send:not(:disabled) {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  box-shadow: 0 4px 14px 0 color-mix(in oklab, var(--color-primary), transparent 80%);
+}
+
+.smeduverse-input-send:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.smeduverse-input-send:disabled {
+  background: var(--color-secondary);
+  color: var(--color-muted-foreground);
+  cursor: not-allowed;
+}
+
+.smeduverse-input-footer {
+  font-size: 0.625rem;
+  text-align: center;
+  color: var(--color-muted-foreground);
+  margin-top: 0.5rem;
+}
+
+/* Floating Action Button */
+.smeduverse-fab {
+  height: 3.5rem;
+  width: 3.5rem;
+  border-radius: 50%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 300ms;
+  z-index: 50;
+  cursor: pointer;
+  border: none;
+}
+
+.smeduverse-fab:hover {
+  transform: scale(1.05);
+}
+
+.smeduverse-fab:active {
+  transform: scale(0.95);
+}
+
+.smeduverse-fab:not(.open) {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+.smeduverse-fab:not(.open):hover {
+  box-shadow: 0 25px 50px -12px color-mix(in oklab, var(--color-primary), transparent 80%);
+}
+
+.smeduverse-fab.open {
+  background: var(--color-secondary);
+  color: var(--color-foreground);
+  transform: rotate(90deg);
+}
+
+.smeduverse-fab-status {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: #10b981;
+  border: 2px solid var(--color-background);
+  border-radius: 50%;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .smeduverse-widget {
+    left: 1rem !important;
+    right: 1rem !important;
+    align-items: center !important;
+  }
+  
+  .smeduverse-chat-window {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .smeduverse-fab {
+    display: none;
+  }
+  
+  .smeduverse-header-button.expand {
+    display: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .dark-auto {
+    --color-background: #0a0a0a;
+    --color-foreground: #fafafa;
+    --color-card: #171717;
+    --color-card-foreground: #fafafa;
+    --color-popover: #171717;
+    --color-popover-foreground: #fafafa;
+    --color-primary: #e5e5e5;
+    --color-primary-foreground: #171717;
+    --color-secondary: #262626;
+    --color-secondary-foreground: #fafafa;
+    --color-muted: #262626;
+    --color-muted-foreground: #a1a1aa;
+    --color-accent: #262626;
+    --color-accent-foreground: #fafafa;
+    --color-destructive: #ef4444;
+    --color-border: #ffffff1a;
+    --color-input: #ffffff26;
+    --color-ring: #71717a;
+  }
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Utility Classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.prose {
+  max-width: none;
+  word-break: break-words;
+}
+
+.prose > *:first-child {
+  margin-top: 0;
+}
+
+.prose > *:last-child {
+  margin-bottom: 0;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.prose p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.prose ul,
+.prose ol {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+  padding-left: 1.5em;
+}
+
+.prose li {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.prose pre {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding: 0.75em;
+  background: var(--color-muted);
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.prose code {
+  background: var(--color-muted);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+.prose pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.dark .prose {
+  color: var(--color-foreground);
+}
+
+.dark .prose code {
+  background: color-mix(in oklab, var(--color-foreground), transparent 90%);
+}
+
+.dark .prose pre {
+  background: color-mix(in oklab, var(--color-foreground), transparent 95%);
+}
+
+.dark .prose pre code {
+  background: transparent;
+}
+
+/* Conversation Component Styles */
+.smeduverse-conversation {
+  position: relative;
+  flex: 1;
+  overflow-y: scroll;
+}
+
+.smeduverse-conversation-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; /* gap-8 equivalent */
+  padding: 1rem; /* p-4 equivalent */
+}
+
+.smeduverse-conversation-empty {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem; /* gap-3 equivalent */
+  padding: 2rem; /* p-8 equivalent */
+  text-align: center;
+}
+
+.smeduverse-text-muted {
+  color: var(--color-muted-foreground);
+}
+
+.smeduverse-spacing-sm > * + * {
+  margin-top: 0.25rem; /* space-y-1 equivalent */
+}
+
+.smeduverse-text-sm {
+  font-size: 0.875rem;
+}
+
+.smeduverse-font-medium {
+  font-weight: 500;
+}
+
+/* Code Block Component Styles */
+.smeduverse-code-block {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.375rem; /* rounded-md equivalent */
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.smeduverse-code-content {
+  overflow: hidden;
+}
+
+.smeduverse-code-content > pre {
+  margin: 0;
+  padding: 1rem; /* p-4 equivalent */
+  background: var(--color-background) !important;
+  color: var(--color-foreground) !important;
+  font-size: 0.875rem; /* text-sm equivalent */
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.smeduverse-code-content > pre > code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.875rem; /* text-sm equivalent */
+}
+
+.smeduverse-code-actions {
+  position: absolute;
+  top: 0.5rem; /* top-2 equivalent */
+  right: 0.5rem; /* right-2 equivalent */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* gap-2 equivalent */
+}
+
+.smeduverse-button-shrink {
+  flex-shrink: 0;
+}
+
+/* Button Group Styles */
+.smeduverse-button-group {
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.smeduverse-button-group > *:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.smeduverse-button-group > *:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.smeduverse-button-group-text {
+  border: none;
+  background: transparent;
+  color: var(--color-muted-foreground);
+  box-shadow: none;
+}
+
+/* Message Attachment Styles */
+.smeduverse-message-attachment {
+  position: relative;
+  width: 6rem; /* size-24 equivalent */
+  height: 6rem;
+  overflow: hidden;
+  border-radius: 0.5rem; /* rounded-lg equivalent */
+}
+
+.smeduverse-attachment-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.smeduverse-attachment-remove {
+  position: absolute;
+  top: 0.5rem; /* top-2 equivalent */
+  right: 0.5rem; /* right-2 equivalent */
+  width: 1.5rem; /* size-6 equivalent */
+  height: 1.5rem;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--color-background), transparent 20%);
+  padding: 0;
+  opacity: 0;
+  backdrop-filter: blur(4px);
+  transition: opacity 150ms;
+}
+
+.smeduverse-message-attachment:hover .smeduverse-attachment-remove {
+  opacity: 1;
+}
+
+.smeduverse-attachment-remove svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.smeduverse-attachment-placeholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem; /* rounded-lg equivalent */
+  background: var(--color-muted);
+  color: var(--color-muted-foreground);
+}
+
+.smeduverse-attachment-placeholder svg {
+  width: 1rem; /* size-4 equivalent */
+  height: 1rem;
+}
+
+.smeduverse-attachment-action {
+  width: 1.5rem; /* size-6 equivalent */
+  height: 1.5rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  padding: 0;
+  opacity: 0;
+  transition: opacity 150ms;
+}
+
+.smeduverse-attachment-action:hover {
+  background: color-mix(in oklab, var(--color-accent), transparent 50%);
+}
+
+.smeduverse-message-attachment:hover .smeduverse-attachment-action {
+  opacity: 1;
+}
+
+.smeduverse-attachment-action svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* Message Attachments Container */
+.smeduverse-message-attachments {
+  margin-left: auto;
+  width: fit-content;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem; /* gap-2 equivalent */
+}
+
+/* Message Toolbar */
+.smeduverse-message-toolbar {
+  margin-top: 1rem; /* mt-4 equivalent */
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem; /* gap-4 equivalent */
+}
+
+/* Grid Layout for Message Branch */
+.smeduverse-message-branch {
+  display: grid;
+  width: 100%;
+  gap: 0.5rem; /* gap-2 equivalent */
+}
+
+.smeduverse-message-branch > * {
+  padding-bottom: 0;
+}
+
+/* Message Branch Content */
+.smeduverse-message-branch-content {
+  display: grid;
+  gap: 0.5rem; /* gap-2 equivalent */
+  overflow: hidden;
+}
+
+.smeduverse-message-branch-content > * {
+  padding-bottom: 0;
+}
