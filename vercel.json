@@ -1,0 +1,51 @@
+{
+	"buildCommand": "bun run build:vercel",
+	"outputDirectory": "dist",
+	"installCommand": "bun install",
+	"framework": null,
+	"rewrites": [
+		{
+			"source": "/((?!cdn).*)",
+			"destination": "/index.html"
+		}
+	],
+	"headers": [
+		{
+			"source": "/cdn/(.*)",
+			"headers": [
+				{
+					"key": "Cache-Control",
+					"value": "public, max-age=31536000, immutable"
+				},
+				{
+					"key": "Access-Control-Allow-Origin",
+					"value": "*"
+				},
+				{
+					"key": "Access-Control-Allow-Methods",
+					"value": "GET, OPTIONS"
+				}
+			]
+		},
+		{
+			"source": "/api/(.*)",
+			"headers": [
+				{
+					"key": "Access-Control-Allow-Origin",
+					"value": "*"
+				},
+				{
+					"key": "Access-Control-Allow-Methods",
+					"value": "GET, POST, OPTIONS"
+				},
+				{
+					"key": "Access-Control-Allow-Headers",
+					"value": "Content-Type, Authorization"
+				}
+			]
+		}
+	],
+	"env": {
+		"NODE_ENV": "production"
+	}
+}

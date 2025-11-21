@@ -8,11 +8,11 @@ import {
 	createContext,
 	type HTMLAttributes,
 	useContext,
-	useEffect,
-	useRef,
 	useState,
 } from "react";
-import { type BundledLanguage, codeToHtml, type ShikiTransformer } from "shiki";
+
+// Simple types for CDN version
+type BundledLanguage = string;
 
 type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {
 	code: string;
@@ -28,50 +28,7 @@ const CodeBlockContext = createContext<CodeBlockContextType>({
 	code: "",
 });
 
-const lineNumberTransformer: ShikiTransformer = {
-	name: "line-numbers",
-	line(node, line) {
-		node.children.unshift({
-			type: "element",
-			tagName: "span",
-			properties: {
-				className: [
-					"inline-block",
-					"min-w-10",
-					"mr-4",
-					"text-right",
-					"select-none",
-					"text-muted-foreground",
-				],
-			},
-			children: [{ type: "text", value: String(line) }],
-		});
-	},
-};
-
-export async function highlightCode(
-	code: string,
-	language: BundledLanguage,
-	showLineNumbers = false,
-) {
-	const transformers: ShikiTransformer[] = showLineNumbers
-		? [lineNumberTransformer]
-		: [];
-
-	return await Promise.all([
-		codeToHtml(code, {
-			lang: language,
-			theme: "one-light",
-			transformers,
-		}),
-		codeToHtml(code, {
-			lang: language,
-			theme: "one-dark-pro",
-			transformers,
-		}),
-	]);
-}
-
+// Simplified CodeBlock for CDN - No Shiki
 export const CodeBlock = ({
 	code,
 	language,
@@ -80,24 +37,6 @@ export const CodeBlock = ({
 	children,
 	...props
 }: CodeBlockProps) => {
-	const [html, setHtml] = useState<string>("");
-	const [darkHtml, setDarkHtml] = useState<string>("");
-	const mounted = useRef(false);
-
-	useEffect(() => {
-		highlightCode(code, language, showLineNumbers).then(([light, dark]) => {
-			if (!mounted.current) {
-				setHtml(light);
-				setDarkHtml(dark);
-				mounted.current = true;
-			}
-		});
-
-		return () => {
-			mounted.current = false;
-		};
-	}, [code, language, showLineNumbers]);
-
 	return (
 		<CodeBlockContext.Provider value={{ code }}>
 			<div
@@ -108,16 +47,11 @@ export const CodeBlock = ({
 				{...props}
 			>
 				<div className="relative">
-					<div
-						className="overflow-hidden dark:hidden [&>pre]:m-0 [&>pre]:bg-background! [&>pre]:p-4 [&>pre]:text-foreground! [&>pre]:text-sm [&_code]:font-mono [&_code]:text-sm"
-						// biome-ignore lint/security/noDangerouslySetInnerHtml: "this is needed."
-						dangerouslySetInnerHTML={{ __html: html }}
-					/>
-					<div
-						className="hidden overflow-hidden dark:block [&>pre]:m-0 [&>pre]:bg-background! [&>pre]:p-4 [&>pre]:text-foreground! [&>pre]:text-sm [&_code]:font-mono [&_code]:text-sm"
-						// biome-ignore lint/security/noDangerouslySetInnerHtml: "this is needed."
-						dangerouslySetInnerHTML={{ __html: darkHtml }}
-					/>
+					<div className="overflow-hidden [&>pre]:m-0 [&>pre]:bg-background! [&>pre]:p-4 [&>pre]:text-foreground! [&>pre]:text-sm [&_code]:font-mono [&_code]:text-sm">
+						<pre>
+							<code className={`language-${language}`}>{code}</code>
+						</pre>
+					</div>
 					{children && (
 						<div className="absolute top-2 right-2 flex items-center gap-2">
 							{children}

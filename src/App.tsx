@@ -99,9 +99,9 @@ export default function App() {
 							icon: Calendar,
 							change: "Selesai pukul 14:00",
 						},
-					].map((stat, i) => (
+					].map((stat) => (
 						<div
-							key={i}
+							key={stat.label}
 							className="bg-card border border-border p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
 						>
 							<div className="flex items-center justify-between mb-4">
