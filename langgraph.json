@@ -1,0 +1,10 @@
+{
+	"$schema": "https://langchain-ai.github.io/langgraph/schemas/langgraph.json",
+	"node_version": "20",
+	"dockerfile_lines": [],
+	"dependencies": ["."],
+	"graphs": {
+		"smeduverse_agent": "./src/agent/graph.ts:graph"
+	},
+	"env": ".env"
+}
