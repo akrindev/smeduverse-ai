@@ -1,51 +1,37 @@
-import { createGroq } from "@ai-sdk/groq";
-import { convertToModelMessages, stepCountIs, streamText, tool } from "ai";
+import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { MemorySaver, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
+import { createUIMessageStreamResponse } from "ai";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
-import { z } from "zod";
 
 /**
- * Backend API handler for Groq LLM with Vercel AI SDK
- * This should be deployed on your server to keep the API key secure
- *
- * Example using Bun.js:
- * bun run backend/api.ts
+ * Backend API handler for Gemini 3 Flash Preview with LangGraph
+ * Deployed on Vercel with stateful conversations and memory persistence
  */
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || "";
 
-if (!GROQ_API_KEY) {
-	console.error("ERROR: GROQ_API_KEY environment variable is required");
-	process.exit(1);
+if (!GOOGLE_API_KEY) {
+  console.error("ERROR: GOOGLE_API_KEY environment variable is required");
+  process.exit(1);
 }
 
-// Initialize Groq with AI SDK
-const groq = createGroq({
-	apiKey: GROQ_API_KEY,
+// Initialize Gemini model with LangChain
+const model = new ChatGoogleGenerativeAI({
+  model: "gemini-3-flash-preview",
+  apiKey: GOOGLE_API_KEY,
+  maxOutputTokens: 12000,
+  temperature: 0.7,
 });
 
-// Define tools using AI SDK format
-const getSchoolStats = tool({
-	description:
-		"Get current school statistics including student count, attendance, grades, and recent events in structured table format.",
-	inputSchema: z.object({}),
-	execute: async () => "test",
-});
-
-const getTeacherPerformance = tool({
-	description: "Get teacher performance data in structured table format.",
-	inputSchema: z.object({}),
-	execute: async () => "test",
-});
-
-// System prompt untuk Smeduverse analytics dalam Bahasa Indonesia
-const SYSTEM_PROMPT = `Anda adalah asisten AI Smeduverse yang mengkhususkan diri dalam menganalisis data pendidikan untuk institusi akademik. 
-Anda membantu guru, staf, dan administrator memahami data mereka melalui query bahasa natural.
-
-Anda memiliki akses ke alat untuk mendapatkan data dalam format tabel terstruktur:
-- 'getSchoolStats' untuk statistik sekolah (jumlah siswa, kehadiran, nilai rata-rata)
-- 'getTeacherPerformance' untuk data performa guru
+const SYSTEM_PROMPT = `Anda adalah asisten AI Smeduverse yang membantu guru, staf, dan administrator di institusi pendidikan.
+Anda membantu dengan:
+- Analisis data pendidikan
+- Pembuatan rencana pembelajaran (RPP)
+- Menjawab pertanyaan seputar kurikulum
+- Motivasi siswa dan strategi pengajaran
 
 PENTING - Format Respons:
 Anda HARUS menggunakan Markdown untuk memformat respons Anda. Gunakan:
@@ -58,11 +44,25 @@ Anda HARUS menggunakan Markdown untuk memformat respons Anda. Gunakan:
 - > untuk blockquotes/kutipan
 - jangan pernah gunakan heading, instead gunakan bold
 
-Untuk pertanyaan tentang statistik sekolah, statistik kehadiran, atau data guru, gunakan alat yang tersedia dan berikan respons yang mencakup:
-1. Penjelasan ringkas dalam bahasa Indonesia dengan format markdown yang sesuai
-2. Tabel data terstruktur dengan kolom dan baris yang jelas (akan di-render otomatis)
+Berikan respons yang ringkas, membantu, dan informatif dalam Bahasa Indonesia dengan format markdown yang baik.`;
 
-Berikan respons yang ringkas, membantu, dan berbasis data dalam Bahasa Indonesia dengan format markdown yang baik.`;
+async function callModel(state: typeof MessagesAnnotation.State) {
+  const systemMessage = {
+    role: "system" as const,
+    content: SYSTEM_PROMPT,
+  };
+  const messagesWithSystem = [systemMessage, ...state.messages];
+  const response = await model.invoke(messagesWithSystem);
+  return { messages: [response] };
+}
+
+const checkpointer = new MemorySaver();
+
+const graph = new StateGraph(MessagesAnnotation)
+  .addNode("agent", callModel)
+  .addEdge("__start__", "agent")
+  .addEdge("agent", "__end__")
+  .compile({ checkpointer });
 
 // Create Hono app
 const app = new Hono();
@@ -75,52 +75,47 @@ app.use("/cdn/*", serveStatic({ root: "./dist" }));
 
 // Health check endpoint
 app.get("/health", (c) => {
-	return c.json({ status: "ok" });
+  return c.json({ status: "ok" });
 });
 
-// Chat endpoint using AI SDK
 app.post("/api/chat", async (c) => {
-	try {
-		const body = await c.req.json();
-		const { messages } = body;
+  try {
+    const body = await c.req.json();
+    const { messages, thread_id } = body;
 
-		if (!messages || !Array.isArray(messages)) {
-			return c.json({ error: "Messages array is required" }, 400);
-		}
+    if (!messages || !Array.isArray(messages)) {
+      return c.json({ error: "Messages array is required" }, 400);
+    }
 
-		// Use AI SDK's streamText with Groq
-		const result = streamText({
-			model: groq("openai/gpt-oss-120b"),
-			maxOutputTokens: 12000,
-			temperature: 0.7,
-			system: SYSTEM_PROMPT,
-			messages: convertToModelMessages(messages),
-			tools: {
-				getSchoolStats,
-				getTeacherPerformance,
-			},
-			stopWhen: stepCountIs(20),
-		});
+    const config = {
+      configurable: {
+        thread_id: thread_id || crypto.randomUUID(),
+      },
+      checkpointer,
+    };
 
-		// Return AI SDK data stream response
-		return result.toUIMessageStreamResponse({
-			headers: {
-				"Transfer-Encoding": "chunked",
-				Connection: "keep-alive",
-			},
-		});
-	} catch (error) {
-		console.error("Chat request error:", error);
-		return c.json(
-			{
-				error: error instanceof Error ? error.message : "Internal server error",
-			},
-			500,
-		);
-	}
+    const langchainMessages = await toBaseMessages(messages);
+
+    const stream = await graph.stream(
+      { messages: langchainMessages },
+      { streamMode: ["values", "messages"], ...config },
+    );
+
+    return createUIMessageStreamResponse({
+      stream: toUIMessageStream(stream),
+    });
+  } catch (error) {
+    console.error("Chat request error:", error);
+    return c.json(
+      {
+        error: error instanceof Error ? error.message : "Internal server error",
+      },
+      500,
+    );
+  }
 });
 
 export default {
-	port: 3000,
-	fetch: app.fetch,
+  port: 3000,
+  fetch: app.fetch,
 };

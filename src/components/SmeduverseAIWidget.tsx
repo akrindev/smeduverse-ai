@@ -15,7 +15,7 @@ import {
 	User,
 	X,
 } from "lucide-react";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "../lib/utils";
 import { Conversation, ConversationContent } from "./ai-elements/conversation";
 import {
@@ -42,10 +42,30 @@ export function SmeduverseAIWidget({
 	const [isOpen, setIsOpen] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [input, setInput] = useState("");
-	const { messages, sendMessage, status, setMessages } = useChat({
-		transport: new DefaultChatTransport({
-			api: apiEndpoint,
-		}),
+	const [threadId] = useState(() => {
+		if (typeof window !== "undefined") {
+			const saved = localStorage.getItem("smeduverse_thread_id");
+			if (saved) return saved;
+			const newId = crypto.randomUUID();
+			localStorage.setItem("smeduverse_thread_id", newId);
+			return newId;
+		}
+		return crypto.randomUUID();
+	});
+
+	const transport = useMemo(
+		() =>
+			new DefaultChatTransport({
+				api: apiEndpoint,
+				body: () => ({
+					thread_id: threadId,
+				}),
+			}),
+		[apiEndpoint, threadId],
+	);
+
+	const { messages, sendMessage, status } = useChat({
+		transport,
 	});
 	const isLoading = status === "submitted" || status === "streaming";
 	const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -53,7 +73,7 @@ export function SmeduverseAIWidget({
 
 	const handleInputChange = (
 		e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } },
-	) => {
+	): void => {
 		setInput(e.target.value);
 	};
 
@@ -287,7 +307,14 @@ export function SmeduverseAIWidget({
 							>
 								<button
 									type="button"
-									onClick={() => setMessages([])}
+									onClick={() => {
+										const newThreadId = crypto.randomUUID();
+										localStorage.setItem(
+											"smeduverse_thread_id",
+											newThreadId,
+										);
+										window.location.reload();
+									}}
 									className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-xl transition-colors"
 									title="Mulai Percakapan Baru"
 								>
