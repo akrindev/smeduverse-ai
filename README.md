@@ -6,16 +6,17 @@
 
 - 🤖 **AI Chat Assistant** - Educational support for teachers and administrators
 - 🧠 **LangGraph Architecture** - Stateful conversations with memory
+- 🔧 **MCP Tools Integration** - Connect to external tools via Model Context Protocol
 - 🎯 **Gemini 2.0 Flash** - Fast, high-quality responses
 - 💾 **Thread Persistence** - Conversation state maintained via localStorage
 - 🔌 **Vercel Ready** - Optimized for serverless deployment
-- 📦 **MCP Tool Ready** - Prepared for HTTP Model Context Protocol integration
 
 ## Tech Stack
 
 - **Frontend**: React 19 + Vite
 - **AI Framework**: LangGraph + LangChain
 - **LLM**: Google Gemini 2.0 Flash Exp
+- **Tool Integration**: Model Context Protocol (MCP) via @langchain/mcp-adapters
 - **UI Components**: Radix UI + Tailwind CSS
 - **Runtime**: Bun
 
@@ -53,6 +54,7 @@ smeduverse-ai/
 ## Environment Variables
 
 - `GOOGLE_API_KEY` - Google AI API key for Gemini model
+- `MCP_SERVER_URL` - URL to MCP server (default: `http://localhost:2222/mcp/smeduverse`)
 
 ## License
 

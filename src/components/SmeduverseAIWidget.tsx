@@ -30,6 +30,7 @@ type WidgetConfig = {
 	primaryColor?: string;
 	title?: string;
 	darkMode?: boolean;
+	mcpKey?: string;
 };
 
 export function SmeduverseAIWidget({
@@ -38,6 +39,7 @@ export function SmeduverseAIWidget({
 	primaryColor,
 	title = "Smeduverse AI",
 	darkMode = false,
+	mcpKey,
 }: WidgetConfig) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -59,9 +61,10 @@ export function SmeduverseAIWidget({
 				api: apiEndpoint,
 				body: () => ({
 					thread_id: threadId,
+					mcp_key: mcpKey,
 				}),
 			}),
-		[apiEndpoint, threadId],
+		[apiEndpoint, threadId, mcpKey],
 	);
 
 	const { messages, sendMessage, status } = useChat({

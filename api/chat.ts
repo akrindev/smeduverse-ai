@@ -1,6 +1,8 @@
 import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { MemorySaver, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
+import { ToolNode, toolsCondition } from "@langchain/langgraph/prebuilt";
+import { MultiServerMCPClient } from "@langchain/mcp-adapters";
 import { createUIMessageStreamResponse } from "ai";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
@@ -12,6 +14,7 @@ import { cors } from "hono/cors";
  */
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || "";
+const MCP_SERVER_URL = process.env.MCP_SERVER_URL || "http://localhost:2222/mcp/smeduverse";
 
 if (!GOOGLE_API_KEY) {
   console.error("ERROR: GOOGLE_API_KEY environment variable is required");
@@ -25,6 +28,49 @@ const model = new ChatGoogleGenerativeAI({
   maxOutputTokens: 12000,
   temperature: 0.7,
 });
+
+// MCP client cache (will be initialized dynamically per request)
+let mcpClient: MultiServerMCPClient | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let tools: any[] = [];
+
+async function initializeMCPClient(mcpKey?: string) {
+  try {
+    let serverUrl = MCP_SERVER_URL.trim();
+    // Remove quotes from URL if present (common .env file issue)
+    serverUrl = serverUrl.replace(/^"|"$/g, "").replace(/^'|'$/g, "");
+    
+    console.log(`Connecting to MCP server at ${serverUrl}...`);
+    
+    // Build MCP server config with optional authentication
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mcpConfig: any = {
+      smeduverse: {
+        url: serverUrl,
+      }
+    };
+    
+    // Add authentication headers if mcpKey is provided
+    if (mcpKey) {
+      mcpConfig.smeduverse.headers = {
+        "Authorization": `Bearer ${mcpKey}`
+      };
+      console.log(`Using authentication with MCP server`);
+    }
+    
+    mcpClient = new MultiServerMCPClient({
+      mcpServers: mcpConfig
+    });
+    
+    tools = await mcpClient.getTools();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    console.log(`MCP tools loaded: ${tools.map((t: any) => t.name).join(", ") || "none"}`);
+    return tools;
+  } catch (error) {
+    console.warn("Failed to connect to MCP server, continuing without tools:", error);
+    return [];
+  }
+}
 
 const SYSTEM_PROMPT = `Anda adalah asisten AI Smeduverse yang membantu guru, staf, dan administrator di institusi pendidikan.
 Anda membantu dengan:
@@ -52,16 +98,33 @@ async function callModel(state: typeof MessagesAnnotation.State) {
     content: SYSTEM_PROMPT,
   };
   const messagesWithSystem = [systemMessage, ...state.messages];
-  const response = await model.invoke(messagesWithSystem);
+  
+  // Bind tools if available
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let modelWithTools: any = model;
+  if (tools.length > 0) {
+    modelWithTools = model.bindTools(tools);
+  }
+  
+  const response = await modelWithTools.invoke(messagesWithSystem);
   return { messages: [response] };
 }
 
 const checkpointer = new MemorySaver();
 
+// Create tool node
+const toolNode = new ToolNode(tools);
+
+// Build graph with tool support
 const graph = new StateGraph(MessagesAnnotation)
   .addNode("agent", callModel)
+  .addNode("tools", toolNode)
   .addEdge("__start__", "agent")
-  .addEdge("agent", "__end__")
+  .addConditionalEdges("agent", toolsCondition, {
+    tools: "tools",
+    __end__: "__end__",
+  })
+  .addEdge("tools", "agent")
   .compile({ checkpointer });
 
 // Create Hono app
@@ -81,8 +144,13 @@ app.get("/health", (c) => {
 app.post("/api/chat", async (c) => {
   try {
     const body = await c.req.json();
-    const { messages, thread_id } = body;
-
+    const { messages, thread_id, mcp_key } = body;
+    
+    // Initialize MCP client with authentication if key provided
+    if (mcp_key && mcp_key !== mcpClient) {
+      await initializeMCPClient(mcp_key);
+    }
+    
     if (!messages || !Array.isArray(messages)) {
       return c.json({ error: "Messages array is required" }, 400);
     }

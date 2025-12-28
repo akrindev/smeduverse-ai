@@ -208,7 +208,10 @@ export default function App() {
 			</main>
 
 			{/* The AI Widget */}
-			<SmeduverseAIWidget apiEndpoint="http://localhost:3000/api/chat" />
+			<SmeduverseAIWidget 
+				apiEndpoint="http://localhost:3000/api/chat" 
+				mcpKey={typeof window !== "undefined" ? (window as any).MCP_SERVER_KEY || undefined : undefined} 
+			/>
 		</div>
 	);
 }

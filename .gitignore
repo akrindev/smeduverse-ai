@@ -25,3 +25,4 @@ agent/
 *.sw?
 
 .env
+.serena/

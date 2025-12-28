@@ -61,6 +61,7 @@ The `vercel.json` file handles:
 ### Environment Variables Required
 
 - `GOOGLE_API_KEY`: Your Google AI API key
+- `MCP_SERVER_URL`: MCP server endpoint (default: `http://localhost:2222/mcp/smeduverse`)
 
 ## Architecture Overview
 
@@ -70,6 +71,8 @@ The `vercel.json` file handles:
 - **Memory**: In-memory (MemorySaver) for state persistence
 - **Streaming**: Uses `toUIMessageStream()` for AI SDK compatibility
 - **Message Format**: LangChain `BaseMessage` converted from AI SDK `UIMessage`
+- **Tool Integration**: MCP tools via `@langchain/mcp-adapters` with `MultiServerMCPClient`
+- **Tool Execution**: ToolNode for executing MCP tools with conditional routing
 
 ### Frontend (SmeduverseAIWidget)
 - **Transport**: DefaultChatTransport with thread_id support
@@ -83,40 +86,58 @@ The `vercel.json` file handles:
 2. **Streaming**: `toUIMessageStream()` converts LangGraph streams → AI SDK format
 3. **Memory**: LangGraph checkpointer maintains conversation state across requests
 4. **Thread Management**: Client generates unique thread_id, passed with each request
+5. **MCP Tools**: `MultiServerMCPClient` connects to MCP server, tools bound to model
+6. **Tool Routing**: Conditional edges route to tool execution when model requests tool use
 
-## Next Steps for MCP Tools Integration
+## MCP Integration
 
-When ready to add HTTP MCP tools:
+### Architecture
 
-1. Install MCP client:
+The backend now integrates with Model Context Protocol (MCP) servers to provide tool capabilities:
+
+```
+User Request → LangGraph Agent → (if tool needed) → ToolNode → MCP Server
+                                      ↓
+                                    Response
+```
+
+### Setup
+
+1. **Configure MCP Server URL**:
 ```bash
-bun add @modelcontextprotocol/sdk
+# In .env file
+MCP_SERVER_URL=http://localhost:2222/mcp/smeduverse
 ```
 
-2. Define tools in LangGraph nodes:
-```typescript
-async function toolNode(state: typeof MessagesAnnotation.State) {
-  const toolCalls = state.messages.at(-1)?.tool_calls;
-  if (!toolCalls) return { messages: [] };
+2. **MCP Client Auto-initialization**:
+- Backend automatically connects to MCP server on startup
+- Tools are discovered and bound to the model
+- If MCP server is unavailable, chat continues without tools
 
-  // Execute MCP tools here
-  const results = await executeMCPCalls(toolCalls);
-  return { messages: results };
-}
-```
+3. **Tool Execution Flow**:
+- Model decides when to use tools based on user query
+- `toolsCondition` checks if tool calls are requested
+- `ToolNode` executes tools via MCP protocol
+- Results returned to conversation context
 
-3. Update graph structure:
+### Adding More MCP Servers
+
+To connect additional MCP servers, modify `api/chat.ts`:
+
 ```typescript
-const graph = new StateGraph(MessagesAnnotation)
-  .addNode("agent", callModel)
-  .addNode("tools", toolNode)
-  .addEdge("__start__", "agent")
-  .addConditionalEdges("agent", shouldContinue, {
-    continue: "tools",
-    end: "__end__"
-  })
-  .addEdge("tools", "agent")
-  .compile({ checkpointer });
+mcpClient = new MultiServerMCPClient({
+  mcpServers: {
+    smeduverse: {
+      url: "http://localhost:2222/mcp/smeduverse",
+      transport: "http",
+    },
+    // Add more servers:
+    filesystem: {
+      url: "http://localhost:3001/mcp",
+      transport: "http",
+    }
+  }
+});
 ```
 
 ## Troubleshooting
