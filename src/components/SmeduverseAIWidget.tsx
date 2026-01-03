@@ -12,8 +12,10 @@ import { Conversation, ConversationContent } from "./ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "./ai-elements/message";
 import { Reasoning, ReasoningContent, ReasoningTrigger } from "./ai-elements/reasoning";
 
+const DEFAULT_API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || "http://localhost:3000/api/chat";
+
 type WidgetConfig = {
-  apiEndpoint: string;
+  apiEndpoint?: string;
   position?: "bottom-right" | "bottom-left" | "bottom-center";
   primaryColor?: string;
   title?: string;
@@ -22,7 +24,7 @@ type WidgetConfig = {
 };
 
 export function SmeduverseAIWidget({
-  apiEndpoint,
+  apiEndpoint = DEFAULT_API_ENDPOINT,
   position = "bottom-right",
   primaryColor,
   title = "Smeduverse AI",
@@ -144,14 +146,14 @@ export function SmeduverseAIWidget({
             )}
           >
             {/* Header */}
-            <div className="flex justify-between items-center bg-blue-300 backdrop-blur-sm p-4 border-border border-b">
+            <div className="flex justify-between items-center bg-blue-700 backdrop-blur-sm p-4 border-border border-b">
               <div className="flex items-center gap-3">
-                <div className="flex justify-center items-center bg-primary/10 border border-primary/20 rounded-full w-8 h-8">
-                  <Sparkles className="w-4 h-4 text-primary" />
+                <div className="flex justify-center items-center rounded-full w-8 h-8">
+                  <Sparkles className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground text-sm">{title}</h3>
-                  <p className="flex items-center gap-1 text-muted-foreground text-xs">
+                  <h3 className="font-semibold text-white text-sm">{title}</h3>
+                  <p className="flex items-center gap-1 text-white text-xs">
                     <span className="bg-green-500 rounded-full w-1.5 h-1.5 animate-pulse" />
                     Online
                   </p>
@@ -161,7 +163,7 @@ export function SmeduverseAIWidget({
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
                   type="button"
-                  className="hidden sm:flex hover:bg-secondary p-2 rounded-full text-muted-foreground hover:text-foreground transition-colors"
+                  className="hidden sm:flex hover:bg-secondary p-2 rounded-full text-white hover:text-foreground transition-colors"
                 >
                   {isExpanded ? (
                     <Minimize2 className="w-4 h-4" />
@@ -172,7 +174,7 @@ export function SmeduverseAIWidget({
                 <button
                   onClick={() => setIsOpen(false)}
                   type="button"
-                  className="hover:bg-destructive/10 p-2 rounded-full text-muted-foreground hover:text-destructive transition-colors"
+                  className="hover:bg-destructive/10 p-2 rounded-full text-white hover:text-destructive transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>

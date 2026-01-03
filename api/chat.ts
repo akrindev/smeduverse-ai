@@ -73,4 +73,5 @@ app.post("/api/chat", async (c) => {
 export default {
   port: 3000,
   fetch: app.fetch,
+  idleTimeout: 120, // 120 seconds to allow long-running AI operations
 };

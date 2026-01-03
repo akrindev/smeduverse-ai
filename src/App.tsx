@@ -1,8 +1,17 @@
 import { BarChart3, Bell, BookOpen, Calendar, Menu, Search, Users } from "lucide-react";
 import { SmeduverseAIWidget } from "./components/SmeduverseAIWidget";
+import { useMcpKey } from "./hooks/useMcpKey";
 import { cn } from "./lib/utils";
 
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || "http://localhost:3000/api/chat";
+const MCP_KEY_ENDPOINT = import.meta.env.VITE_MCP_KEY_ENDPOINT || "http://localhost:2222/mcp/key";
+
 export default function App() {
+  const { token: mcpKey } = useMcpKey({
+    endpoint: MCP_KEY_ENDPOINT,
+    autoFetch: true,
+  });
+
   return (
     <div className="flex flex-col bg-background min-h-screen text-foreground">
       {/* Navigation Bar */}
@@ -184,11 +193,13 @@ export default function App() {
         </div>
       </main>
 
-      {/* The AI Widget */}
-      <SmeduverseAIWidget
-        apiEndpoint="http://localhost:3000/api/chat"
-        mcpKey={`24748|bhDzolHDVB8iYdiRUiUmlijDnt6u1CyvsEKUcILI6caf41bc`}
-      />
+      {/* The AI Widget - only show when MCP key is available */}
+      {mcpKey && (
+        <SmeduverseAIWidget
+          apiEndpoint={API_ENDPOINT}
+          mcpKey={mcpKey}
+        />
+      )}
     </div>
   );
 }
