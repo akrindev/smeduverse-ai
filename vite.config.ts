@@ -10,6 +10,8 @@ export default defineConfig({
 			babel: {
 				plugins: [["babel-plugin-react-compiler"]],
 			},
+			// Exclude the standalone build from React plugin processing to avoid Babel warnings
+			exclude: /smeduverse-ai\.standalone\.js/,
 		}),
 		tailwindcss(),
 	],

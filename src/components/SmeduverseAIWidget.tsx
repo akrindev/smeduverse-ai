@@ -35,8 +35,8 @@ export function SmeduverseAIWidget({
   const [input, setInput] = useState("");
   const [threadId, setThreadId] = useState(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("smeduverse_thread_id");
-      if (saved) return saved;
+      // const saved = localStorage.getItem("smeduverse_thread_id");
+      // if (saved) return saved;
       const newId = crypto.randomUUID();
       localStorage.setItem("smeduverse_thread_id", newId);
       return newId;

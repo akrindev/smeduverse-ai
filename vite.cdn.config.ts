@@ -9,16 +9,19 @@ export default defineConfig({
 		// Polyfill process for browser environment (required by some dependencies)
 		process: JSON.stringify({
 			env: {
-		react({
-			babel: {
-				plugins: [["babel-plugin-react-compiler"]],
+				NODE_ENV: "production",
 			},
 		}),
+		"process.env.NODE_ENV": JSON.stringify("production"),
+		// Polyfill React Refresh for standalone build in case it leaks
+		$RefreshSig$: "() => (type) => type",
+		$RefreshReg$: "() => {}",
+	},
+	plugins: [
+		react({
 			babel: {
 				plugins: [],
 			},
-			// Disable Fast Refresh for standalone build
-			fastRefresh: false,
 		}),
 		tailwindcss(),
 	],
