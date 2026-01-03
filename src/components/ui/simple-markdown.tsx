@@ -31,6 +31,9 @@ export const SimpleMarkdown = memo(
           "[&_pre]:bg-secondary/50 [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto",
           "[&_code]:bg-secondary/50 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm",
           "[&_a]:text-primary [&_a]:underline",
+          "[&_table]:w-full [&_table]:border-collapse [&_table]:my-4 [&_table]:text-xs",
+          "[&_th]:border [&_th]:border-border [&_th]:bg-secondary/50 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold",
+          "[&_td]:border [&_td]:border-border [&_td]:px-3 [&_td]:py-2",
           className
         )}
         // biome-ignore lint/security/noDangerouslySetInnerHtml: markdown rendering
