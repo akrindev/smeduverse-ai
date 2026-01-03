@@ -1,61 +1,153 @@
-# Smeduverse AI
+# Smeduverse AI Widget
 
-✨ Artificial Intelligence Powered School Management System with LangGraph Integration
+A powerful, AI-powered school management chat widget built with React, LangGraph, and Gemini. This widget can be embedded into any web application to provide intelligent assistance to users.
 
 ## Features
 
-- 🤖 **AI Chat Assistant** - Educational support for teachers and administrators
-- 🧠 **LangGraph Architecture** - Stateful conversations with memory
-- 🔧 **MCP Tools Integration** - Connect to external tools via Model Context Protocol
-- 🎯 **Gemini 2.0 Flash** - Fast, high-quality responses
-- 💾 **Thread Persistence** - Conversation state maintained via localStorage
-- 🔌 **Vercel Ready** - Optimized for serverless deployment
+- 🤖 **AI Chat Assistant**: Context-aware educational support.
+- 🧠 **LangGraph Integration**: Stateful conversations with memory and reasoning.
+- 🛠️ **MCP Tools**: Extensible tool system via Model Context Protocol.
+- 🎨 **Customizable UI**: Built with Tailwind CSS and Radix UI.
+- 📦 **Flexible Integration**: Use as a React component or a standalone script.
 
-## Tech Stack
+## Installation
 
-- **Frontend**: React 19 + Vite
-- **AI Framework**: LangGraph + LangChain
-- **LLM**: Google Gemini 2.0 Flash Exp
-- **Tool Integration**: Model Context Protocol (MCP) via @langchain/mcp-adapters
-- **UI Components**: Radix UI + Tailwind CSS
-- **Runtime**: Bun
+### Prerequisites
 
-## Quick Start
+- Node.js (v18+) or Bun (v1+)
+- A backend server running the Smeduverse AI API (included in this repo)
+
+### Building the Widget
+
+To build the widget for production:
 
 ```bash
+# Install dependencies
 bun install
-cp .env.example .env
-# Add GOOGLE_API_KEY to .env
+
+# Build for React applications (ES Module & UMD)
+bun run build:widget
+
+# Build for non-React applications (Standalone IIFE)
+bun run build:standalone
+```
+
+The build artifacts will be generated in the `dist/` directory:
+- `smeduverse-ai.es.js`: ES Module for bundlers.
+- `smeduverse-ai.umd.js`: UMD build.
+- `smeduverse-ai.standalone.js`: Self-contained bundle with React included.
+
+---
+
+## Implementation Guide
+
+### 1. React Application
+
+If you are using a React application, install the package (or link it locally) and import the component.
+
+```tsx
+import { SmeduverseAIWidget } from 'smeduverse-ai-agent';
+import 'smeduverse-ai-agent/dist/style.css'; // If CSS is not inlined
+
+function App() {
+  return (
+    <div className="App">
+      <SmeduverseAIWidget 
+        apiEndpoint="http://localhost:3000/api/chat"
+        mcpKeyEndpoint="http://localhost:2222/mcp/key"
+        title="School Assistant"
+        initialMessage="Hello! How can I help you with school management today?"
+      />
+    </div>
+  );
+}
+```
+
+### 2. Standalone HTML (Script Tag)
+
+For legacy applications or non-React sites, use the standalone build. This bundles React and ReactDOM so you don't need to provide them.
+
+#### Option A: Automatic Initialization
+Add the `data-smeduverse-ai` attribute to a container div. The widget will automatically mount there.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My School App</title>
+</head>
+<body>
+    <!-- Widget Container -->
+    <div 
+        data-smeduverse-ai
+        data-api-endpoint="http://localhost:3000/api/chat"
+        data-mcp-key-endpoint="http://localhost:2222/mcp/key"
+        data-title="Smeduverse Assistant"
+        data-position="bottom-right"
+    ></div>
+
+    <!-- Load the Script -->
+    <script src="./dist/smeduverse-ai.standalone.js"></script>
+</body>
+</html>
+```
+
+#### Option B: Manual Initialization
+You can manually initialize the widget using the global `SmeduverseAI` object.
+
+```html
+<div id="my-widget-container"></div>
+
+<script src="./dist/smeduverse-ai.standalone.js"></script>
+<script>
+    SmeduverseAI.init({
+        containerId: 'my-widget-container',
+        apiEndpoint: 'http://localhost:3000/api/chat',
+        title: 'Custom Assistant',
+        theme: 'light'
+    });
+</script>
+```
+
+---
+
+## Configuration
+
+### Props / Data Attributes
+
+| Prop Name        | Data Attribute          | Type    | Default         | Description                                      |
+| ---------------- | ----------------------- | ------- | --------------- | ------------------------------------------------ |
+| `apiEndpoint`    | `data-api-endpoint`     | string  | (Required)      | URL of the chat API backend.                     |
+| `mcpKeyEndpoint` | `data-mcp-key-endpoint` | string  | (Optional)      | URL to fetch MCP authentication keys.            |
+| `title`          | `data-title`            | string  | "Smeduverse AI" | Title shown in the chat header.                  |
+| `initialMessage` | `data-initial-message`  | string  | "..."           | The first message shown to the user.             |
+| `position`       | `data-position`         | string  | "bottom-right"  | Widget position (`bottom-right`, `bottom-left`). |
+| `isOpen`         | `data-is-open`          | boolean | false           | Whether the chat window is open by default.      |
+
+---
+
+## Backend Setup
+
+The widget requires a backend to handle LangGraph processing and LLM communication.
+
+1.  **Configure Environment**:
+    Copy `.env.example` to `.env` and add your keys:
+    ```env
+    GOOGLE_API_KEY=your_gemini_key
+    ```
+
+2.  **Start the Server**:
+    ```bash
+    bun run start
+    ```
+    The API will be available at `http://localhost:3000/api/chat`.
+
+## Development
+
+To run the full development environment (Frontend + Backend):
+
+```bash
 bun run dev
 ```
 
-## Deployment
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment guide.
-
-## Project Structure
-
-```
-smeduverse-ai/
-├── api/
-│   └── chat.ts          # LangGraph backend with Gemini
-├── src/
-│   ├── components/
-│   │   ├── SmeduverseAIWidget.tsx  # Main chat widget
-│   │   └── ai-elements/            # UI components
-│   ├── lib/
-│   │   └── utils.ts
-│   ├── App.tsx
-│   └── main.tsx
-├── DEPLOYMENT.md
-└── package.json
-```
-
-## Environment Variables
-
-- `GOOGLE_API_KEY` - Google AI API key for Gemini model
-- `MCP_SERVER_URL` - URL to MCP server (default: `http://localhost:2222/mcp/smeduverse`)
-
-## License
-
-Private project
+This starts the Hono server for the API and the Vite dev server for the React widget.

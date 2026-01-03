@@ -21,9 +21,10 @@
 		"start": "bun run api/chat.ts",
 		"build": "tsc -b && vite build",
 		"build:widget": "vite build",
-		"build:standalone": "BUILD_STANDALONE=true vite build",
+		"build:standalone": "vite build -c vite.cdn.config.ts",
 		"lint": "eslint .",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"preview:example": "vite --open examples/standalone.html"
 	},
 	"dependencies": {
 		"@ai-sdk/groq": "^3.0.1",

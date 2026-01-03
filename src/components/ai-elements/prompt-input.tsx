@@ -286,14 +286,14 @@ export function PromptInputAttachment({
       <HoverCardTrigger asChild>
         <div
           className={cn(
-            "group relative flex h-8 cursor-default select-none items-center gap-1.5 rounded-md border border-border px-1.5 font-medium text-sm transition-all hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+            "group relative flex items-center gap-1.5 hover:bg-accent dark:hover:bg-accent/50 px-1.5 border border-border rounded-md h-8 font-medium text-sm transition-all hover:text-accent-foreground cursor-default select-none",
             className
           )}
           key={data.id}
           {...props}
         >
           <div className="relative size-5 shrink-0">
-            <div className="absolute inset-0 flex size-5 items-center justify-center overflow-hidden rounded bg-background transition-opacity group-hover:opacity-0">
+            <div className="absolute inset-0 flex justify-center items-center bg-background group-hover:opacity-0 rounded size-5 overflow-hidden transition-opacity">
               {isImage ? (
                 <img
                   alt={filename || "attachment"}
@@ -303,14 +303,14 @@ export function PromptInputAttachment({
                   width={20}
                 />
               ) : (
-                <div className="flex size-5 items-center justify-center text-muted-foreground">
+                <div className="flex justify-center items-center size-5 text-muted-foreground">
                   <PaperclipIcon className="size-3" />
                 </div>
               )}
             </div>
             <Button
               aria-label="Remove attachment"
-              className="absolute inset-0 size-5 cursor-pointer rounded p-0 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 [&>svg]:size-2.5"
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 p-0 rounded size-5 [&>svg]:size-2.5 transition-opacity cursor-pointer group-hover:pointer-events-auto"
               onClick={(e) => {
                 e.stopPropagation();
                 attachments.remove(data.id);
@@ -326,13 +326,13 @@ export function PromptInputAttachment({
           <span className="flex-1 truncate">{attachmentLabel}</span>
         </div>
       </HoverCardTrigger>
-      <PromptInputHoverCardContent className="w-auto p-2">
-        <div className="w-auto space-y-3">
+      <PromptInputHoverCardContent className="p-2 w-auto">
+        <div className="space-y-3 w-auto">
           {isImage && (
-            <div className="flex max-h-96 w-96 items-center justify-center overflow-hidden rounded-md border">
+            <div className="flex justify-center items-center border rounded-md w-96 max-h-96 overflow-hidden">
               <img
                 alt={filename || "attachment preview"}
-                className="max-h-full max-w-full object-contain"
+                className="max-w-full max-h-full object-contain"
                 height={384}
                 src={data.url}
                 width={448}
@@ -340,12 +340,12 @@ export function PromptInputAttachment({
             </div>
           )}
           <div className="flex items-center gap-2.5">
-            <div className="min-w-0 flex-1 space-y-1 px-0.5">
-              <h4 className="truncate font-semibold text-sm leading-none">
+            <div className="flex-1 space-y-1 px-0.5 min-w-0">
+              <h4 className="font-semibold text-sm truncate leading-none">
                 {filename || (isImage ? "Image" : "Attachment")}
               </h4>
               {data.mediaType && (
-                <p className="truncate font-mono text-muted-foreground text-xs">
+                <p className="font-mono text-muted-foreground text-xs truncate">
                   {data.mediaType}
                 </p>
               )}
@@ -865,7 +865,7 @@ export const PromptInputTextarea = ({
 
   return (
     <InputGroupTextarea
-      className={cn("field-sizing-content max-h-48 min-h-16", className)}
+      className={cn("min-h-16 max-h-48 field-sizing-content", className)}
       name="message"
       onCompositionEnd={() => setIsComposing(false)}
       onCompositionStart={() => setIsComposing(true)}
@@ -889,7 +889,7 @@ export const PromptInputHeader = ({
 }: PromptInputHeaderProps) => (
   <InputGroupAddon
     align="block-end"
-    className={cn("order-first flex-wrap gap-1", className)}
+    className={cn("flex-wrap gap-1 order-first", className)}
     {...props}
   />
 );
@@ -1195,7 +1195,7 @@ export const PromptInputSelectTrigger = ({
 }: PromptInputSelectTriggerProps) => (
   <SelectTrigger
     className={cn(
-      "border-none bg-transparent font-medium text-muted-foreground shadow-none transition-colors",
+      "bg-transparent shadow-none border-none font-medium text-muted-foreground transition-colors",
       "hover:bg-accent hover:text-foreground aria-expanded:bg-accent aria-expanded:text-foreground",
       className
     )}
@@ -1307,7 +1307,7 @@ export const PromptInputTabItem = ({
 }: PromptInputTabItemProps) => (
   <div
     className={cn(
-      "flex items-center gap-2 px-3 py-2 text-xs hover:bg-accent",
+      "flex items-center gap-2 hover:bg-accent px-3 py-2 text-xs",
       className
     )}
     {...props}
