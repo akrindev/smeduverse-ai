@@ -3,10 +3,25 @@
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
+	"main": "./dist/smeduverse-ai.umd.js",
+	"module": "./dist/smeduverse-ai.es.js",
+	"types": "./dist/smeduverse-ai.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/smeduverse-ai.d.ts",
+			"import": "./dist/smeduverse-ai.es.js",
+			"require": "./dist/smeduverse-ai.umd.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"dev": "bun run --hot api/chat.ts & vite",
 		"start": "bun run api/chat.ts",
 		"build": "tsc -b && vite build",
+		"build:widget": "vite build",
+		"build:standalone": "BUILD_STANDALONE=true vite build",
 		"lint": "eslint .",
 		"preview": "vite preview"
 	},
@@ -40,6 +55,7 @@
 		"framer-motion": "^12.23.26",
 		"hono": "^4.11.3",
 		"lucide-react": "^0.554.0",
+		"marked": "^17.0.1",
 		"motion": "^12.23.26",
 		"nanoid": "^5.1.6",
 		"react": "^19.2.3",

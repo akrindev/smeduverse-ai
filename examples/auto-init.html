@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmeduverseAI Widget - Auto Init Example</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <h1>SmeduverseAI Widget - Auto Init</h1>
+        <p>This example uses <code>data-smeduverse-ai</code> attribute for automatic initialization.</p>
+        <p>No JavaScript code required - just add the data attributes to your container!</p>
+
+        <h2>Usage:</h2>
+        <pre><code>&lt;div 
+  data-smeduverse-ai
+  data-api-endpoint="http://localhost:3000/api/chat"
+  data-mcp-key-endpoint="http://localhost:2222/mcp/key"
+  data-position="bottom-right"
+  data-title="My AI Assistant"
+&gt;&lt;/div&gt;</code></pre>
+    </div>
+
+    <!-- Auto-init widget using data attributes -->
+    <div data-smeduverse-ai data-api-endpoint="http://localhost:3000/api/chat"
+        data-mcp-key-endpoint="http://localhost:2222/mcp/key" data-position="bottom-right" data-title="Smeduverse AI">
+    </div>
+
+    <!-- Load the widget script - it will auto-init on DOMContentLoaded -->
+    <script src="../dist/smeduverse-ai.iife.js"></script>
+</body>
+
+</html>

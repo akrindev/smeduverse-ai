@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmeduverseAI Widget - Standalone Example</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content">
+        <h1>SmeduverseAI Widget Example</h1>
+        <p>This is an example of using the SmeduverseAI widget in a standalone HTML page.</p>
+        <p>The AI assistant widget should appear in the bottom-right corner of the page.</p>
+
+        <h2>Features:</h2>
+        <ul>
+            <li>AI-powered chat assistant</li>
+            <li>MCP tools integration</li>
+            <li>Persistent conversation history</li>
+            <li>Expandable chat window</li>
+        </ul>
+    </div>
+
+    <!-- Widget container (optional - can also auto-init with data attributes) -->
+    <div id="smeduverse-widget"></div>
+
+    <!-- Load the widget script -->
+    <script src="../dist/smeduverse-ai.iife.js"></script>
+
+    <script>
+        // Option 1: Programmatic initialization
+        const widget = new SmeduverseAI.SmeduverseAI({
+            container: '#smeduverse-widget',
+            apiEndpoint: 'http://localhost:3000/api/chat',
+            mcpKeyEndpoint: 'http://localhost:2222/mcp/key',
+            position: 'bottom-right',
+            title: 'Smeduverse AI',
+        });
+        widget.init();
+
+        // Note: The widget will automatically fetch the MCP key from the endpoint
+        // using cookies (withCredentials: true), so make sure your backend
+        // supports CORS with credentials.
+    </script>
+</body>
+
+</html>

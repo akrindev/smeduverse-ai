@@ -7,11 +7,11 @@ import {
   setStoredToken,
   useMcpKey,
 } from "./hooks/useMcpKey";
-import "./index.css";
+import styles from "./index.css?inline";
 
 export type WidgetOptions = {
   container: string | HTMLElement;
-  apiEndpoint: string;
+  apiEndpoint?: string;
   mcpKeyEndpoint?: string;
   mcpKey?: string;
   position?: "bottom-right" | "bottom-left" | "bottom-center";
@@ -19,6 +19,17 @@ export type WidgetOptions = {
   title?: string;
   darkMode?: boolean;
 };
+
+// Inject CSS styles into the page (only once)
+let stylesInjected = false;
+function injectStyles(): void {
+  if (stylesInjected || typeof document === "undefined") return;
+  const styleEl = document.createElement("style");
+  styleEl.id = "smeduverse-ai-styles";
+  styleEl.textContent = styles;
+  document.head.appendChild(styleEl);
+  stylesInjected = true;
+}
 
 class SmeduverseAI {
   private root: ReturnType<typeof createRoot> | null = null;
@@ -30,6 +41,9 @@ class SmeduverseAI {
   }
 
   async init(): Promise<void> {
+    // Inject CSS styles
+    injectStyles();
+
     // Get container
     if (typeof this.options.container === "string") {
       this.container = document.querySelector(this.options.container);

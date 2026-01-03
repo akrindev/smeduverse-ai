@@ -4,8 +4,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, getToolName, isToolUIPart } from "ai";
-import { AnimatePresence, motion } from "framer-motion";
-import { Bot, Maximize2, Minimize2, RotateCcw, Send, Sparkles, User, X } from "lucide-react";
+import { Bot, Maximize2, Minimize2, RotateCcw, Send, Sparkles, Square, User, X } from "lucide-react";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { cn } from "../lib/utils";
 import { Conversation, ConversationContent } from "./ai-elements/conversation";
@@ -57,13 +56,27 @@ export function SmeduverseAIWidget({
     [apiEndpoint, threadId, mcpKey],
   );
 
-  const { messages, sendMessage, status, setMessages } = useChat({
+  const { messages, sendMessage, status, setMessages, stop } = useChat({
     id: threadId,
     transport,
   });
   const isLoading = status === "submitted" || status === "streaming";
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Reset chat handler
+  const handleReset = () => {
+    // Stop any ongoing streaming
+    stop?.();
+    // Generate new thread ID
+    const newThreadId = crypto.randomUUID();
+    localStorage.setItem("smeduverse_thread_id", newThreadId);
+    setThreadId(newThreadId);
+    // Clear all messages
+    setMessages([]);
+    // Clear input
+    setInput("");
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } },
@@ -127,24 +140,23 @@ export function SmeduverseAIWidget({
       )}
       style={getCustomStyles()}
     >
-      <AnimatePresence>
+      {/* Chat Window */}
+      <div
+        className={cn(
+          "flex flex-col bg-card shadow-2xl border border-border rounded-2xl overflow-hidden",
+          "max-w-[calc(100vw-1rem)] max-h-[calc(100vh-6rem)]",
+          "transition-all duration-200 ease-out origin-bottom-right",
+          isOpen
+            ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
+            : "opacity-0 scale-95 translate-y-5 pointer-events-none h-0",
+        )}
+        style={{
+          height: isOpen ? (isExpanded ? "80vh" : "600px") : 0,
+          width: isOpen ? (isExpanded ? "920px" : "550px") : "550px",
+        }}
+      >
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              height: isExpanded ? "80vh" : "600px",
-              width: isExpanded ? "920px" : "550px",
-            }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className={cn(
-              "flex flex-col bg-card shadow-2xl border border-border rounded-2xl overflow-hidden",
-              "max-w-[calc(100vw-1rem)] max-h-[calc(100vh-6rem)]", // Responsive constraints
-            )}
-          >
+          <>
             {/* Header */}
             <div className="flex justify-between items-center bg-blue-700 backdrop-blur-sm p-4 border-border border-b">
               <div className="flex items-center gap-3">
@@ -236,7 +248,7 @@ export function SmeduverseAIWidget({
                               className={cn(
                                 "flex justify-center items-center border rounded-full w-8 h-8 shrink-0",
                                 m.role === "user"
-                                  ? "bg-primary text-primary-foreground border-primary"
+                                  ? "bg-blue-700 text-white border-blue-700"
                                   : "bg-secondary text-secondary-foreground border-border",
                               )}
                             >
@@ -260,7 +272,7 @@ export function SmeduverseAIWidget({
                                       className={cn(
                                         "shadow-sm p-3 rounded-2xl text-sm leading-relaxed",
                                         m.role === "user"
-                                          ? "bg-primary text-primary-foreground rounded-tr-none"
+                                          ? "bg-blue-700 text-white rounded-tr-none"
                                           : "bg-card border border-border rounded-tl-none",
                                       )}
                                     >
@@ -369,13 +381,7 @@ export function SmeduverseAIWidget({
               <form onSubmit={handleSubmit} className="relative flex items-end gap-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    const newThreadId = crypto.randomUUID();
-                    localStorage.setItem("smeduverse_thread_id", newThreadId);
-                    setThreadId(newThreadId);
-                    setMessages([]);
-                    setInput("");
-                  }}
+                  onClick={handleReset}
                   className="hover:bg-secondary p-2.5 rounded-xl text-muted-foreground hover:text-foreground transition-colors"
                   title="Mulai Percakapan Baru"
                 >
@@ -391,36 +397,48 @@ export function SmeduverseAIWidget({
                   />
                 </div>
                 <button
-                  type="submit"
-                  disabled={isLoading || !input?.trim()}
+                  type={isLoading ? "button" : "submit"}
+                  onClick={(e) => {
+                    if (isLoading) {
+                      e.preventDefault();
+                      stop();
+                    }
+                  }}
+                  disabled={!isLoading && !input?.trim()}
                   className={cn(
                     "p-2.5 rounded-xl transition-all duration-200",
-                    input?.trim()
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:opacity-90"
-                      : "bg-secondary text-muted-foreground cursor-not-allowed",
+                    isLoading
+                      ? "bg-red-500 text-white shadow-lg shadow-red-500/20 hover:opacity-90 animate-pulse"
+                      : input?.trim()
+                        ? "bg-blue-700 text-white shadow-lg shadow-blue-700/20 hover:opacity-90"
+                        : "bg-secondary text-muted-foreground cursor-not-allowed",
                   )}
                 >
-                  <Send className="w-5 h-5" />
+                  {isLoading ? (
+                    <Square className="fill-current w-5 h-5" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
                 </button>
               </form>
               <div className="mt-2 text-[10px] text-muted-foreground text-center">
                 Didukung oleh AI. Mohon verifikasi informasi penting.
               </div>
             </div>
-          </motion.div>
+          </>
         )}
-      </AnimatePresence>
+      </div>
 
       {/* Floating Action Button */}
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+      <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "z-50 flex justify-center items-center shadow-2xl rounded-full w-14 h-14 transition-all duration-300",
+          "z-50 flex justify-center items-center shadow-2xl rounded-full w-14 h-14 transition-all duration-200",
+          "hover:scale-105 active:scale-95",
           isOpen
             ? "bg-secondary text-foreground rotate-90"
-            : "bg-primary text-primary-foreground hover:shadow-primary/25",
+            : "bg-blue-700 text-white hover:bg-blue-800 hover:shadow-blue-700/25",
         )}
       >
         {isOpen ? (
@@ -431,7 +449,7 @@ export function SmeduverseAIWidget({
             <span className="-top-1 -right-1 absolute bg-green-500 border-2 border-background rounded-full w-3 h-3" />
           </div>
         )}
-      </motion.button>
+      </button>
     </div>
   );
 }
