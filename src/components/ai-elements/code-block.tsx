@@ -4,19 +4,16 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import {
-  type ComponentProps,
-  createContext,
-  type HTMLAttributes,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
+    type ComponentProps,
+    createContext,
+    type HTMLAttributes,
+    useContext,
+    useState
 } from "react";
-import { type BundledLanguage, codeToHtml, type ShikiTransformer } from "shiki";
 
 type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {
   code: string;
-  language: BundledLanguage;
+  language: string;
   showLineNumbers?: boolean;
 };
 
@@ -28,48 +25,43 @@ const CodeBlockContext = createContext<CodeBlockContextType>({
   code: "",
 });
 
-const lineNumberTransformer: ShikiTransformer = {
-  name: "line-numbers",
-  line(node, line) {
-    node.children.unshift({
-      type: "element",
-      tagName: "span",
-      properties: {
-        className: [
-          "inline-block",
-          "min-w-10",
-          "mr-4",
-          "text-right",
-          "select-none",
-          "text-muted-foreground",
-        ],
-      },
-      children: [{ type: "text", value: String(line) }],
-    });
-  },
-};
+// Simple syntax highlighting without heavy Shiki bundle
+// This provides basic styling without language-specific highlighting
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function highlightCodeSimple(
+  code: string,
+  _language: string,
+  showLineNumbers = false
+): { light: string; dark: string } {
+  const lines = code.split("\n");
+  const htmlLines = lines.map((line, i) => {
+    const lineNum = showLineNumbers
+      ? `<span class="inline-block mr-4 min-w-10 text-muted-foreground text-right select-none">${i + 1}</span>`
+      : "";
+    return `<span class="line">${lineNum}${escapeHtml(line)}</span>`;
+  });
+
+  const content = htmlLines.join("\n");
+  const wrapper = `<pre class="shiki" style="background-color: transparent;"><code>${content}</code></pre>`;
+
+  return { light: wrapper, dark: wrapper };
+}
 
 export async function highlightCode(
   code: string,
-  language: BundledLanguage,
+  language: string,
   showLineNumbers = false
-) {
-  const transformers: ShikiTransformer[] = showLineNumbers
-    ? [lineNumberTransformer]
-    : [];
-
-  return await Promise.all([
-    codeToHtml(code, {
-      lang: language,
-      theme: "one-light",
-      transformers,
-    }),
-    codeToHtml(code, {
-      lang: language,
-      theme: "one-dark-pro",
-      transformers,
-    }),
-  ]);
+): Promise<[string, string]> {
+  const { light, dark } = highlightCodeSimple(code, language, showLineNumbers);
+  return [light, dark];
 }
 
 export const CodeBlock = ({
@@ -80,46 +72,34 @@ export const CodeBlock = ({
   children,
   ...props
 }: CodeBlockProps) => {
-  const [html, setHtml] = useState<string>("");
-  const [darkHtml, setDarkHtml] = useState<string>("");
-  const mounted = useRef(false);
-
-  useEffect(() => {
-    highlightCode(code, language, showLineNumbers).then(([light, dark]) => {
-      if (!mounted.current) {
-        setHtml(light);
-        setDarkHtml(dark);
-        mounted.current = true;
-      }
-    });
-
-    return () => {
-      mounted.current = false;
-    };
-  }, [code, language, showLineNumbers]);
+  const { light: html, dark: darkHtml } = highlightCodeSimple(
+    code,
+    language,
+    showLineNumbers
+  );
 
   return (
     <CodeBlockContext.Provider value={{ code }}>
       <div
         className={cn(
-          "group relative w-full overflow-hidden rounded-md border bg-background text-foreground",
+          "group relative bg-background border rounded-md w-full overflow-hidden text-foreground",
           className
         )}
         {...props}
       >
         <div className="relative">
           <div
-            className="overflow-hidden dark:hidden [&>pre]:m-0 [&>pre]:bg-background! [&>pre]:p-4 [&>pre]:text-foreground! [&>pre]:text-sm [&_code]:font-mono [&_code]:text-sm"
+            className="dark:hidden [&>pre]:bg-background! [&>pre]:m-0 [&>pre]:p-4 overflow-hidden [&_code]:font-mono [&>pre]:text-foreground! [&_code]:text-sm [&>pre]:text-sm"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: "this is needed."
             dangerouslySetInnerHTML={{ __html: html }}
           />
           <div
-            className="hidden overflow-hidden dark:block [&>pre]:m-0 [&>pre]:bg-background! [&>pre]:p-4 [&>pre]:text-foreground! [&>pre]:text-sm [&_code]:font-mono [&_code]:text-sm"
+            className="hidden dark:block [&>pre]:bg-background! [&>pre]:m-0 [&>pre]:p-4 overflow-hidden [&_code]:font-mono [&>pre]:text-foreground! [&_code]:text-sm [&>pre]:text-sm"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: "this is needed."
             dangerouslySetInnerHTML={{ __html: darkHtml }}
           />
           {children && (
-            <div className="absolute top-2 right-2 flex items-center gap-2">
+            <div className="top-2 right-2 absolute flex items-center gap-2">
               {children}
             </div>
           )}

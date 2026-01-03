@@ -5,13 +5,23 @@ import { defineConfig } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
+	define: {
+		// Polyfill process for browser environment (required by some dependencies)
+		process: JSON.stringify({
+			env: {
+				NODE_ENV: "production",
+			},
+		}),
+		"process.env.NODE_ENV": JSON.stringify("production"),
+		// Polyfill React Refresh for standalone build in case it leaks
+		$RefreshSig$: "() => (type) => type",
+		$RefreshReg$: "() => {}",
+	},
 	plugins: [
 		react({
 			babel: {
-				plugins: [["babel-plugin-react-compiler"]],
+				plugins: [],
 			},
-			// Exclude the standalone build from React plugin processing to avoid Babel warnings
-			exclude: /smeduverse-ai\.standalone\.js/,
 		}),
 		tailwindcss(),
 	],
@@ -24,21 +34,16 @@ export default defineConfig({
 		lib: {
 			entry: path.resolve(__dirname, "src/widget.tsx"),
 			name: "SmeduverseAI",
-			formats: ["es", "umd"],
-			fileName: (format) => `smeduverse-ai.${format}.js`,
+			formats: ["iife"],
+			fileName: () => "smeduverse-ai.standalone.js",
 		},
 		rollupOptions: {
-			// Externalize React for library builds
-			external: ["react", "react-dom", "react/jsx-runtime"],
+			// No externals for standalone build - bundle everything
+			external: [],
 			output: {
 				name: "SmeduverseAI",
 				inlineDynamicImports: true,
 				exports: "named",
-				globals: {
-					react: "React",
-					"react-dom": "ReactDOM",
-					"react/jsx-runtime": "jsxRuntime",
-				},
 			},
 		},
 		cssCodeSplit: false,
