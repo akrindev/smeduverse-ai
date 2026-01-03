@@ -327,24 +327,19 @@ export function SmeduverseAIWidget({
                                   }
 
                                   return (
-                                    <div key={`${part.toolCallId}-tool-${i}`}>
-                                      <div className="bg-card shadow-sm p-3 border border-border rounded-2xl rounded-tl-none text-sm leading-relaxed">
-                                        {/* state */}
-                                        {part.state && (
-                                          <div className="mb-2 text-muted-foreground text-xs italic">
-                                            {part.state === "input-streaming" && "Menyiapkan..."}
-                                            {part.state === "input-available" && "Memproses..."}
-                                            {part.state === "approval-requested" &&
-                                              "Menunggu persetujuan..."}
-                                            {part.state === "approval-responded" &&
-                                              "Persetujuan diterima"}
-                                            {part.state === "output-available" && "Selesai"}
-                                            {part.state === "output-error" && "Terjadi kesalahan"}
-                                            {part.state === "output-denied" && "Akses ditolak"}
-                                          </div>
-                                        )}
-                                        {/* output */}
-                                        <strong>{displayTitle}</strong>
+                                    <div key={`${part.toolCallId}-tool-${i}`} className="py-1">
+                                      <div className="flex items-center gap-2 bg-secondary/50 px-2.5 py-1.5 rounded-lg w-fit text-muted-foreground text-xs">
+                                        <div
+                                          className={cn(
+                                            "rounded-full w-1.5 h-1.5",
+                                            part.state === "output-available"
+                                              ? "bg-green-500"
+                                              : part.state === "output-error"
+                                                ? "bg-red-500"
+                                                : "bg-blue-500 animate-pulse",
+                                          )}
+                                        />
+                                        <span className="font-medium">{displayTitle}</span>
                                       </div>
                                     </div>
                                   );
