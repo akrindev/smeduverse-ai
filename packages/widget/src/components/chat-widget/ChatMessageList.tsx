@@ -6,6 +6,7 @@ import { cn } from "../../lib/utils";
 import { Conversation, ConversationContent } from "../ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "../ai-elements/message";
 import { Reasoning, ReasoningContent, ReasoningTrigger } from "../ai-elements/reasoning";
+import { ToolStatus } from "./ToolStatus";
 
 interface ChatMessageListProps {
   messages: AIMessage[];
@@ -96,132 +97,13 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
                             seenToolCallIds.add(part.toolCallId);
                           }
 
-                          const toolName = getToolName(part);
-                          const toolNameLower = toolName.toLowerCase();
-
-                          // Helper to get a readable input value
-                          const getInputValue = () => {
-                            if (!part.input || typeof part.input !== "object") return "";
-                            const values = Object.values(part.input);
-                            // Prioritize string inputs that look like queries
-                            return (
-                              values.find(
-                                (v) => typeof v === "string" && v.length < 50
-                              ) || ""
-                            );
-                          };
-
-                          const inputValue = getInputValue();
-                          let displayTitle = toolName;
-
-                          // Map common tool patterns to friendly Indonesian text
-                          if (
-                            toolName === "listClasses" ||
-                            toolName === "groupClassesByJurusan" ||
-                            toolName === "listJurusan" ||
-                            toolName === "listTahunAjaran" ||
-                            toolName === "listJenisPtk"
-                          ) {
-                            displayTitle = "🏫 Mengambil data referensi sekolah...";
-                          } else if (toolName === "getClassRoster") {
-                            displayTitle = inputValue
-                              ? `📋 Cek daftar kelas ${inputValue}`
-                              : "📋 Mengambil daftar siswa di kelas...";
-                          } else if (toolName === "listMapel") {
-                            displayTitle = "📚 Mengambil daftar mata pelajaran...";
-                          } else if (toolName === "getSchoolStats") {
-                            displayTitle = "📊 Mengambil statistik sekolah...";
-                          } else if (toolName === "listStudents") {
-                            displayTitle = "👥 Mengambil daftar siswa...";
-                          } else if (toolName === "getStudent") {
-                            displayTitle = inputValue
-                              ? `👤 Mencari data siswa "${inputValue}"`
-                              : "👤 Mencari data siswa...";
-                          } else if (toolName === "listTeachers") {
-                            displayTitle = "👨‍🏫 Mengambil daftar guru...";
-                          } else if (toolName === "getTeacher") {
-                            displayTitle = inputValue
-                              ? `👨‍🏫 Mencari data guru "${inputValue}"`
-                              : "👨‍🏫 Mencari data guru...";
-                          } else if (
-                            toolName === "teacherAttendanceDay" ||
-                            toolName === "teacherAttendanceRangeSummary" ||
-                            toolName === "teacherAttendanceSettings" ||
-                            toolName === "studentAttendance"
-                          ) {
-                            displayTitle = "📅 Mengakses data absensi...";
-                          } else if (toolName.toLowerCase().includes("orbit")) {
-                            displayTitle = "📚 Mengakses data LMS (Orbit)...";
-                          } else if (toolName === "academicCalendar") {
-                            displayTitle = "📅 Cek kalender akademik...";
-                          } else if (
-                            toolNameLower.includes("search") ||
-                            toolNameLower.includes("google")
-                          ) {
-                            displayTitle = inputValue
-                              ? `🔍 Mencari "${inputValue}"`
-                              : "🔍 Sedang mencari informasi...";
-                          } else if (
-                            toolNameLower.includes("calculator") ||
-                            toolNameLower.includes("math")
-                          ) {
-                            displayTitle = inputValue
-                              ? `🧮 Menghitung ${inputValue}`
-                              : "🧮 Sedang melakukan perhitungan...";
-                          } else if (
-                            toolNameLower.includes("image") ||
-                            toolNameLower.includes("generate")
-                          ) {
-                            displayTitle = "🎨 Sedang membuat konten...";
-                          } else if (toolNameLower.includes("weather")) {
-                            displayTitle = inputValue
-                              ? `☁️ Cek cuaca ${inputValue}`
-                              : "☁️ Mengecek kondisi cuaca...";
-                          } else if (
-                            toolNameLower.includes("map") ||
-                            toolNameLower.includes("location")
-                          ) {
-                            displayTitle = inputValue
-                              ? `📍 Mencari lokasi ${inputValue}`
-                              : "📍 Mengakses peta...";
-                          } else if (
-                            toolNameLower.includes("get") ||
-                            toolNameLower.includes("fetch") ||
-                            toolNameLower.includes("read")
-                          ) {
-                            displayTitle = "📥 Mengambil data...";
-                          } else if (toolNameLower.includes("list")) {
-                            displayTitle = "📋 Menyiapkan daftar...";
-                          } else if (
-                            toolNameLower.includes("send") ||
-                            toolNameLower.includes("email")
-                          ) {
-                            displayTitle = "📤 Mengirim pesan...";
-                          } else {
-                            // Generic fallback but formatted nicely
-                            const friendlyName = toolName
-                              .replace(/_/g, " ")
-                              .replace(/([A-Z])/g, " $1")
-                              .trim();
-                            displayTitle = `⚙️ Memproses: ${friendlyName}`;
-                          }
-
                           return (
-                            <div key={`${part.toolCallId}-tool-${i}`} className="py-1">
-                              <div className="flex items-center gap-2 bg-secondary/50 px-2.5 py-1.5 rounded-lg w-fit text-muted-foreground text-xs">
-                                <div
-                                  className={cn(
-                                    "rounded-full w-1.5 h-1.5",
-                                    (part as any).state === "output-available"
-                                      ? "bg-green-500"
-                                      : (part as any).state === "output-error"
-                                        ? "bg-red-500"
-                                        : "bg-blue-500 animate-pulse"
-                                  )}
-                                />
-                                <span className="font-medium">{displayTitle}</span>
-                              </div>
-                            </div>
+                            <ToolStatus
+                              key={`${part.toolCallId}-tool-${i}`}
+                              toolName={getToolName(part)}
+                              input={(part as any).args || (part as any).input}
+                              state={(part as any).state}
+                            />
                           );
                         }
 
