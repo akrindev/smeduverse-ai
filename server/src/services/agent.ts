@@ -16,10 +16,10 @@ if (!GOOGLE_API_KEY) {
 const model = new ChatGoogleGenerativeAI({
   model: "gemini-3-flash-preview",
   apiKey: GOOGLE_API_KEY,
-  maxOutputTokens: 62000,
-  temperature: 0.9,
+  maxOutputTokens: 65000,
+  temperature: 0.8,
   cache: true,
-  maxRetries: 3,
+  maxRetries: 12,
   // thinkingConfig: {
   //   includeThoughts: true,
   //   thinkingLevel: "MEDIUM",
