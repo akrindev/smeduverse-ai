@@ -29,6 +29,7 @@ export default defineConfig({
 		},
 	},
 	build: {
+		emptyOutDir: false,
 		lib: {
 			entry: path.resolve(__dirname, "packages/widget/src/index.tsx"),
 			name: "SmeduverseAI",
