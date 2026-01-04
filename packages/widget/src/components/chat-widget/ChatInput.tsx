@@ -36,7 +36,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="bg-card p-4 border-border border-t">
+    <div className="bg-white dark:bg-gray-900 p-4 border-border border-t">
       <form onSubmit={onSubmit} className="relative flex items-end gap-2">
         <button
           type="button"

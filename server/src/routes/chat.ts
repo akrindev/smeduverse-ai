@@ -19,7 +19,17 @@ const isVercel = process.env.VERCEL === "1";
 const app = new Hono();
 
 // Add CORS middleware
-app.use("/*", cors());
+app.use(
+  "/*",
+  cors({
+    origin: (origin) => origin,
+    allowMethods: ["POST", "GET", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 600,
+    credentials: true,
+  })
+);
 
 // Serve static files from dist directory (only in local dev with Bun)
 // On Vercel, static files are served from public/ directory via CDN
