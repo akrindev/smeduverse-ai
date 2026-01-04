@@ -2,6 +2,7 @@ import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "../../lib/utils"
+import { useShadowRoot } from "../../context/ShadowRootContext"
 
 function TooltipProvider({
   delayDuration = 0,
@@ -38,8 +39,9 @@ function TooltipContent({
   children,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+  const shadowRoot = useShadowRoot()
   return (
-    <TooltipPrimitive.Portal>
+    <TooltipPrimitive.Portal container={shadowRoot as unknown as HTMLElement}>
       <TooltipPrimitive.Content
         data-slot="tooltip-content"
         sideOffset={sideOffset}
