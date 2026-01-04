@@ -3,13 +3,14 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, getToolName, isToolUIPart } from "ai";
-import { Bot, Maximize2, Minimize2, RotateCcw, Send, Sparkles, Square, User, X } from "lucide-react";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { DefaultChatTransport } from "ai";
+import { useMemo, useState } from "react";
 import { cn } from "../lib/utils";
-import { Conversation, ConversationContent } from "./ai-elements/conversation";
-import { Message, MessageContent, MessageResponse } from "./ai-elements/message";
-import { Reasoning, ReasoningContent, ReasoningTrigger } from "./ai-elements/reasoning";
+import { ChatInput } from "./chat-widget/ChatInput";
+import { ChatMessageList } from "./chat-widget/ChatMessageList";
+import { WelcomeScreen } from "./chat-widget/WelcomeScreen";
+import { WidgetHeader } from "./chat-widget/WidgetHeader";
+import { WidgetToggle } from "./chat-widget/WidgetToggle";
 
 const DEFAULT_API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || "http://localhost:3000/api/chat";
 
@@ -61,8 +62,6 @@ export function SmeduverseAIWidget({
     transport,
   });
   const isLoading = status === "submitted" || status === "streaming";
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   // Reset chat handler
   const handleReset = () => {
@@ -78,12 +77,6 @@ export function SmeduverseAIWidget({
     setInput("");
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } },
-  ): void => {
-    setInput(e.target.value);
-  };
-
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (input.trim()) {
@@ -91,20 +84,6 @@ export function SmeduverseAIWidget({
       setInput("");
     }
   };
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
-
-  // Focus input when opened
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  }, [isOpen]);
 
   // Helper for position classes
   const getPositionClasses = () => {
@@ -157,381 +136,33 @@ export function SmeduverseAIWidget({
       >
         {isOpen && (
           <>
-            {/* Header */}
-            <div className="flex justify-between items-center bg-blue-700 backdrop-blur-sm p-4 border-border border-b">
-              <div className="flex items-center gap-3">
-                <div className="flex justify-center items-center rounded-full w-8 h-8">
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-white text-sm">{title}</h3>
-                  <p className="flex items-center gap-1 text-white text-xs">
-                    <span className="bg-green-500 rounded-full w-1.5 h-1.5 animate-pulse" />
-                    Online
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  type="button"
-                  className="hidden sm:flex hover:bg-secondary p-2 rounded-full text-white hover:text-foreground transition-colors"
-                >
-                  {isExpanded ? (
-                    <Minimize2 className="w-4 h-4" />
-                  ) : (
-                    <Maximize2 className="w-4 h-4" />
-                  )}
-                </button>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  type="button"
-                  className="hover:bg-destructive/10 p-2 rounded-full text-white hover:text-destructive transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+            <WidgetHeader
+              title={title}
+              isExpanded={isExpanded}
+              onToggleExpand={() => setIsExpanded(!isExpanded)}
+              onClose={() => setIsOpen(false)}
+            />
 
-            {/* Messages Area */}
-            <div className="flex-1 space-y-4 bg-background/50 p-2 overflow-y-auto">
-              {messages.length === 0 && (
-                <div className="flex flex-col justify-center items-center space-y-4 p-8 h-full text-muted-foreground text-center">
-                  <div className="flex justify-center items-center bg-secondary/50 mb-2 rounded-2xl w-16 h-16">
-                    <Bot className="opacity-50 w-8 h-8" />
-                  </div>
-                  <div>
-                    <h4 className="mb-1 font-medium text-foreground">Halo, Bapak/Ibu Guru!</h4>
-                    <p className="mx-auto max-w-60 text-sm">
-                      Saya siap membantu menganalisis nilai siswa, membuat RPP, atau menjawab
-                      pertanyaan seputar kurikulum.
-                    </p>
-                  </div>
-                  <div className="gap-2 grid grid-cols-1 w-full max-w-xs text-xs">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setInput("Buatkan rencana pembelajaran untuk topik Fotosintesis kelas 7");
-                        // Optional: auto-submit or just fill input
-                      }}
-                      className="bg-card hover:bg-secondary/50 p-2 border border-border rounded-lg text-left transition-colors"
-                    >
-                      "Buatkan RPP Fotosintesis kelas 7"
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setInput("Bagaimana cara meningkatkan motivasi siswa yang rendah?");
-                      }}
-                      className="bg-card hover:bg-secondary/50 p-2 border border-border rounded-lg text-left transition-colors"
-                    >
-                      "Tips motivasi siswa"
-                    </button>
-                  </div>
-                </div>
-              )}
+            {messages.length === 0 ? (
+              <WelcomeScreen onSuggestionClick={(text) => setInput(text)} />
+            ) : (
+              <ChatMessageList messages={messages} isLoading={isLoading} />
+            )}
 
-              <Conversation>
-                <ConversationContent>
-                  {(() => {
-                    const seenToolCallIds = new Set<string>();
-                    return messages.map((m) => (
-                      <Fragment key={m.id}>
-                        <Message from={m.role} className="max-w-[90%]">
-                          <MessageContent
-                            className={cn(
-                              "flex gap-3 max-w-full",
-                              m.role === "user" ? "ml-auto flex-row-reverse" : "",
-                            )}
-                          >
-                            <div
-                              className={cn(
-                                "flex justify-center items-center border rounded-full w-8 h-8 shrink-0",
-                                m.role === "user"
-                                  ? "bg-blue-700 text-white border-blue-700"
-                                  : "bg-secondary text-secondary-foreground border-border",
-                              )}
-                            >
-                              {m.role === "user" ? (
-                                <User className="w-4 h-4" />
-                              ) : (
-                                <Bot className="w-4 h-4" />
-                              )}
-                            </div>
-                            <div
-                              className={cn(
-                                "flex flex-col flex-1 gap-2",
-                                m.role === "user" ? "items-end" : "items-start",
-                              )}
-                            >
-                              {m.parts.map((part: any, i) => {
-                                if (part.type === "text") {
-                                  return (
-                                    <div
-                                      key={`${m.role}-${i}`}
-                                      className={cn(
-                                        "shadow-sm p-3 rounded-2xl text-sm leading-relaxed",
-                                        m.role === "user"
-                                          ? "bg-blue-700 text-white rounded-tr-none"
-                                          : "bg-card border border-border rounded-tl-none",
-                                      )}
-                                    >
-                                      <MessageResponse>{part.text}</MessageResponse>
-                                    </div>
-                                  );
-                                }
-
-                                if (part.type === "reasoning") {
-                                  return (
-                                    <div
-                                      key={`${m.id}-reasoning-${i}`}
-                                      className="bg-card shadow-sm p-3 border border-border rounded-2xl rounded-tl-none text-sm leading-relaxed"
-                                    >
-                                      <Reasoning>
-                                        <ReasoningTrigger />
-                                        <ReasoningContent>{part.reasoning}</ReasoningContent>
-                                      </Reasoning>
-                                    </div>
-                                  );
-                                }
-
-                                if (isToolUIPart(part)) {
-                                  if (part.toolCallId && seenToolCallIds.has(part.toolCallId)) {
-                                    return null;
-                                  }
-                                  if (part.toolCallId) {
-                                    seenToolCallIds.add(part.toolCallId);
-                                  }
-
-                                  const toolName = getToolName(part);
-                                  const toolNameLower = toolName.toLowerCase();
-
-                                  // Helper to get a readable input value
-                                  const getInputValue = () => {
-                                    if (!part.input || typeof part.input !== "object") return "";
-                                    const values = Object.values(part.input);
-                                    // Prioritize string inputs that look like queries
-                                    return (
-                                      values.find(
-                                        (v) => typeof v === "string" && v.length < 50,
-                                      ) || ""
-                                    );
-                                  };
-
-                                  const inputValue = getInputValue();
-                                  let displayTitle = toolName;
-
-                                  // Map common tool patterns to friendly Indonesian text
-                                  if (
-                                    toolName === "listClasses" ||
-                                    toolName === "groupClassesByJurusan" ||
-                                    toolName === "listJurusan" ||
-                                    toolName === "listTahunAjaran" ||
-                                    toolName === "listJenisPtk"
-                                  ) {
-                                    displayTitle = "🏫 Mengambil data referensi sekolah...";
-                                  } else if (toolName === "getClassRoster") {
-                                    displayTitle = inputValue
-                                      ? `📋 Cek daftar kelas ${inputValue}`
-                                      : "📋 Mengambil daftar siswa di kelas...";
-                                  } else if (toolName === "listMapel") {
-                                    displayTitle = "📚 Mengambil daftar mata pelajaran...";
-                                  } else if (toolName === "getSchoolStats") {
-                                    displayTitle = "📊 Mengambil statistik sekolah...";
-                                  } else if (toolName === "listStudents") {
-                                    displayTitle = "👥 Mengambil daftar siswa...";
-                                  } else if (toolName === "getStudent") {
-                                    displayTitle = inputValue
-                                      ? `👤 Mencari data siswa "${inputValue}"`
-                                      : "👤 Mencari data siswa...";
-                                  } else if (toolName === "listTeachers") {
-                                    displayTitle = "👨‍🏫 Mengambil daftar guru...";
-                                  } else if (toolName === "getTeacher") {
-                                    displayTitle = inputValue
-                                      ? `👨‍🏫 Mencari data guru "${inputValue}"`
-                                      : "👨‍🏫 Mencari data guru...";
-                                  } else if (
-                                    toolName === "teacherAttendanceDay" ||
-                                    toolName === "teacherAttendanceRangeSummary" ||
-                                    toolName === "teacherAttendanceSettings" ||
-                                    toolName === "studentAttendance"
-                                  ) {
-                                    displayTitle = "📅 Mengakses data absensi...";
-                                  } else if (toolName.toLowerCase().includes("orbit")) {
-                                    displayTitle = "📚 Mengakses data LMS (Orbit)...";
-                                  } else if (toolName === "academicCalendar") {
-                                    displayTitle = "📅 Cek kalender akademik...";
-                                  } else if (
-                                    toolNameLower.includes("search") ||
-                                    toolNameLower.includes("google")
-                                  ) {
-                                    displayTitle = inputValue
-                                      ? `🔍 Mencari "${inputValue}"`
-                                      : "🔍 Sedang mencari informasi...";
-                                  } else if (
-                                    toolNameLower.includes("calculator") ||
-                                    toolNameLower.includes("math")
-                                  ) {
-                                    displayTitle = inputValue
-                                      ? `🧮 Menghitung ${inputValue}`
-                                      : "🧮 Sedang melakukan perhitungan...";
-                                  } else if (
-                                    toolNameLower.includes("image") ||
-                                    toolNameLower.includes("generate")
-                                  ) {
-                                    displayTitle = "🎨 Sedang membuat konten...";
-                                  } else if (toolNameLower.includes("weather")) {
-                                    displayTitle = inputValue
-                                      ? `☁️ Cek cuaca ${inputValue}`
-                                      : "☁️ Mengecek kondisi cuaca...";
-                                  } else if (
-                                    toolNameLower.includes("map") ||
-                                    toolNameLower.includes("location")
-                                  ) {
-                                    displayTitle = inputValue
-                                      ? `📍 Mencari lokasi ${inputValue}`
-                                      : "📍 Mengakses peta...";
-                                  } else if (
-                                    toolNameLower.includes("get") ||
-                                    toolNameLower.includes("fetch") ||
-                                    toolNameLower.includes("read")
-                                  ) {
-                                    displayTitle = "📥 Mengambil data...";
-                                  } else if (toolNameLower.includes("list")) {
-                                    displayTitle = "📋 Menyiapkan daftar...";
-                                  } else if (
-                                    toolNameLower.includes("send") ||
-                                    toolNameLower.includes("email")
-                                  ) {
-                                    displayTitle = "📤 Mengirim pesan...";
-                                  } else {
-                                    // Generic fallback but formatted nicely
-                                    const friendlyName = toolName
-                                      .replace(/_/g, " ")
-                                      .replace(/([A-Z])/g, " $1")
-                                      .trim();
-                                    displayTitle = `⚙️ Memproses: ${friendlyName}`;
-                                  }
-
-                                  return (
-                                    <div key={`${part.toolCallId}-tool-${i}`} className="py-1">
-                                      <div className="flex items-center gap-2 bg-secondary/50 px-2.5 py-1.5 rounded-lg w-fit text-muted-foreground text-xs">
-                                        <div
-                                          className={cn(
-                                            "rounded-full w-1.5 h-1.5",
-                                            part.state === "output-available"
-                                              ? "bg-green-500"
-                                              : part.state === "output-error"
-                                                ? "bg-red-500"
-                                                : "bg-blue-500 animate-pulse",
-                                          )}
-                                        />
-                                        <span className="font-medium">{displayTitle}</span>
-                                      </div>
-                                    </div>
-                                  );
-                                }
-
-                                return null;
-                              })}
-                            </div>
-                          </MessageContent>
-                        </Message>
-                      </Fragment>
-                    ));
-                  })()}
-                </ConversationContent>
-              </Conversation>
-
-              {isLoading && (
-                <div className="flex gap-3 max-w-[85%]">
-                  <div className="flex justify-center items-center bg-secondary border border-border rounded-full w-8 h-8 shrink-0">
-                    <Bot className="w-4 h-4 animate-pulse" />
-                  </div>
-                  <div className="flex items-center gap-1 bg-card shadow-sm p-3 border border-border rounded-2xl rounded-tl-none text-sm">
-                    <span className="bg-muted-foreground rounded-full w-1.5 h-1.5 animate-bounce [animation-delay:-0.3s]" />
-                    <span className="bg-muted-foreground rounded-full w-1.5 h-1.5 animate-bounce [animation-delay:-0.15s]" />
-                    <span className="bg-muted-foreground rounded-full w-1.5 h-1.5 animate-bounce" />
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Area */}
-            <div className="bg-card p-4 border-border border-t">
-              <form onSubmit={handleSubmit} className="relative flex items-end gap-2">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="hover:bg-secondary p-2.5 rounded-xl text-muted-foreground hover:text-foreground transition-colors"
-                  title="Mulai Percakapan Baru"
-                >
-                  <RotateCcw className="w-5 h-5" />
-                </button>
-                <div className="relative flex-1">
-                  <input
-                    ref={inputRef}
-                    value={input || ""}
-                    onChange={handleInputChange}
-                    placeholder="Ketik pesan Anda..."
-                    className="bg-secondary/50 px-4 py-2.5 pr-10 border border-border focus:border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 w-full placeholder:text-muted-foreground text-sm transition-all"
-                  />
-                </div>
-                <button
-                  type={isLoading ? "button" : "submit"}
-                  onClick={(e) => {
-                    if (isLoading) {
-                      e.preventDefault();
-                      stop();
-                    }
-                  }}
-                  disabled={!isLoading && !input?.trim()}
-                  className={cn(
-                    "p-2.5 rounded-xl transition-all duration-200",
-                    isLoading
-                      ? "bg-red-500 text-white shadow-lg shadow-red-500/20 hover:opacity-90 animate-pulse"
-                      : input?.trim()
-                        ? "bg-blue-700 text-white shadow-lg shadow-blue-700/20 hover:opacity-90"
-                        : "bg-secondary text-muted-foreground cursor-not-allowed",
-                  )}
-                >
-                  {isLoading ? (
-                    <Square className="fill-current w-5 h-5" />
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
-                </button>
-              </form>
-              <div className="mt-2 text-[10px] text-muted-foreground text-center">
-                Didukung oleh AI. Mohon verifikasi informasi penting.
-              </div>
-            </div>
+            <ChatInput
+              input={input}
+              setInput={setInput}
+              isLoading={isLoading}
+              onStop={() => stop()}
+              onReset={handleReset}
+              onSubmit={handleSubmit}
+              autoFocusTrigger={isOpen}
+            />
           </>
         )}
       </div>
 
-      {/* Floating Action Button */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          "z-50 flex justify-center items-center shadow-2xl rounded-full w-14 h-14 transition-all duration-200",
-          "hover:scale-105 active:scale-95",
-          isOpen
-            ? "bg-secondary text-foreground rotate-90"
-            : "bg-blue-700 text-white hover:bg-blue-800 hover:shadow-blue-700/25",
-        )}
-      >
-        {isOpen ? (
-          <X className="w-6 h-6" />
-        ) : (
-          <div className="relative">
-            <Bot className="w-7 h-7" />
-            <span className="-top-1 -right-1 absolute bg-green-500 border-2 border-background rounded-full w-3 h-3" />
-          </div>
-        )}
-      </button>
+      <WidgetToggle isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 }
