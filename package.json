@@ -17,8 +17,8 @@
 		"dist"
 	],
 	"scripts": {
-		"dev": "bun run --hot server/src/routes/chat.ts & vite --config vite.dev.config.ts",
-		"dev:api": "bun run --hot server/src/routes/chat.ts",
+		"dev": "bun run --watch server/src/routes/chat.ts & vite --config vite.dev.config.ts",
+		"dev:api": "bun run --watch server/src/routes/chat.ts",
 		"dev:vercel": "vercel dev",
 		"start": "NODE_ENV=production bun run server/src/routes/chat.ts",
 		"build": "NODE_ENV=production tsc -b && vite build --mode production",

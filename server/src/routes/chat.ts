@@ -24,7 +24,15 @@ app.use(
   cors({
     origin: (origin) => origin,
     allowMethods: ["POST", "GET", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
+    allowHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+      "X-CSRF-Token",
+      "Access-Control-Allow-Origin",
+    ],
     exposeHeaders: ["Content-Length"],
     maxAge: 600,
     credentials: true,
