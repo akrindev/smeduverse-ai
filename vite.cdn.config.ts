@@ -6,14 +6,12 @@ import { defineConfig } from "vite";
 // https://vite.dev/config/
 export default defineConfig({
 	define: {
-		// Polyfill process for browser environment (required by some dependencies)
 		process: JSON.stringify({
 			env: {
 				NODE_ENV: "production",
 			},
 		}),
 		"process.env.NODE_ENV": JSON.stringify("production"),
-		// Polyfill React Refresh for standalone build in case it leaks
 		$RefreshSig$: "() => (type) => type",
 		$RefreshReg$: "() => {}",
 	},
@@ -27,18 +25,17 @@ export default defineConfig({
 	],
 	resolve: {
 		alias: {
-			"@": path.resolve(__dirname, "./src"),
+			"@widget": path.resolve(__dirname, "./packages/widget/src"),
 		},
 	},
 	build: {
 		lib: {
-			entry: path.resolve(__dirname, "src/widget.tsx"),
+			entry: path.resolve(__dirname, "packages/widget/src/index.tsx"),
 			name: "SmeduverseAI",
 			formats: ["iife"],
 			fileName: () => "smeduverse-ai.standalone.js",
 		},
 		rollupOptions: {
-			// No externals for standalone build - bundle everything
 			external: [],
 			output: {
 				name: "SmeduverseAI",
