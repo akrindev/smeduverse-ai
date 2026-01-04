@@ -55,7 +55,8 @@ app.post("/api/chat", async (c) => {
     const graph = createGraphWithTools(tools);
 
     const stream = await graph.stream(
-      { messages: langchainMessages },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      { messages: langchainMessages as any },
       {
         streamMode: ["values", "messages"],
         ...config,
