@@ -20,6 +20,9 @@ bun run build:widget
 bun run build:standalone
 
 # Type check
+bun run typecheck
+
+# Lint
 bun run lint
 
 # Start backend only
@@ -29,18 +32,61 @@ bun run start
 ## Project Structure
 
 ```
-api/           # Backend (Hono server + LangGraph agent)
-  ├── agent.ts    # LangGraph state machine + MCP tools
-  ├── chat.ts     # Hono API routes
-  └── prompt.ts   # System prompt
-src/           # Frontend (React widget)
-  ├── widget.tsx              # Library entry point
-  ├── components/
-  │   ├── SmeduverseAIWidget.tsx  # Main widget component
-  │   ├── ai-elements/            # AI chat UI components
-  │   └── ui/                     # Radix-based UI primitives
-  └── hooks/
-      └── useMcpKey.ts            # MCP authentication hook
+smeduverse-ai/
+├── api/                      # Vercel serverless entry point
+│   └── index.ts              # Exports Hono app for Vercel
+│
+├── server/                   # Backend API
+│   └── src/
+│       ├── routes/
+│       │   └── chat.ts       # Hono API routes
+│       ├── services/
+│       │   └── agent.ts      # LangGraph agent + MCP tools
+│       ├── prompts/
+│       │   └── system.ts     # System prompt
+│       └── index.ts          # Server entry point
+│
+├── packages/
+│   └── widget/               # React widget package
+│       └── src/
+│           ├── components/
+│           │   ├── ai-elements/    # AI chat UI components
+│           │   ├── ui/             # Radix-based UI primitives
+│           │   ├── index.ts        # Barrel exports
+│           │   └── SmeduverseAIWidget.tsx
+│           ├── hooks/
+│           │   ├── useMcpKey.ts
+│           │   └── index.ts
+│           ├── lib/
+│           │   └── utils.ts
+│           ├── styles/
+│           │   └── index.css
+│           └── index.tsx           # Library entry point
+│
+├── apps/
+│   └── demo/                 # Demo application
+│       ├── App.tsx
+│       ├── main.tsx
+│       └── assets/
+│
+├── docs/                     # Documentation
+│   └── DEPLOYMENT.md
+│
+├── examples/                 # HTML usage examples
+│   ├── standalone.html
+│   └── auto-init.html
+│
+├── public/                   # Static assets
+│
+├── index.html                # Demo app entry
+├── vite.config.ts            # Widget build config
+├── vite.cdn.config.ts        # Standalone build config
+├── vite.dev.config.ts        # Development config
+├── tsconfig.json             # Base TypeScript config
+├── tsconfig.app.json         # Frontend TypeScript config
+├── tsconfig.server.json      # Backend TypeScript config
+├── tsconfig.node.json        # Vite/Node TypeScript config
+└── package.json
 ```
 
 ## Code Style & Conventions
@@ -54,6 +100,8 @@ src/           # Frontend (React widget)
 - Keep components small and focused
 - Use `marked` for markdown parsing (lightweight)
 - Use axios with `withCredentials: true` for authenticated requests
+- Use relative imports within packages
+- Export from barrel files (index.ts) for clean imports
 
 ### Don't
 - Do not use `framer-motion` (removed for bundle size)
@@ -61,19 +109,21 @@ src/           # Frontend (React widget)
 - Do not add heavy dependencies without checking bundle impact
 - Do not hardcode colors - use CSS variables
 - Do not use `fetch` for MCP key endpoint - use axios with credentials
+- Do not use `@/` path aliases in widget package (use relative imports)
 
 ## TypeScript
 
 - Strict mode enabled
-- Path alias: `@/` maps to `src/`
-- Target: ES2020
+- Path alias: `@widget/*` maps to `packages/widget/src/*`
+- Path alias: `@server/*` maps to `server/src/*`
+- Target: ES2022 (frontend), ES2023 (backend)
 - Use `type` imports when possible: `import type { ... }`
 
 ## Component Patterns
 
 ```tsx
 // Use cn() for conditional classes
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 <div className={cn(
   "base-classes",
@@ -81,7 +131,7 @@ import { cn } from "@/lib/utils";
 )} />
 
 // Use Radix primitives
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button";
 ```
 
 ## API Patterns
@@ -89,7 +139,7 @@ import { Button } from "@/components/ui/button";
 Backend uses Hono with streaming responses:
 
 ```typescript
-// api/chat.ts
+// server/src/routes/chat.ts
 app.post("/api/chat", async (c) => {
   const { messages, thread_id, mcp_key } = await c.req.json();
   // ... LangGraph streaming

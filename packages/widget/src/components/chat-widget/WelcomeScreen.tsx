@@ -1,0 +1,55 @@
+import { Bot } from "lucide-react";
+
+interface WelcomeScreenProps {
+  onSuggestionClick: (text: string) => void;
+}
+
+export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
+  return (
+    <div className="flex-1 bg-background/50 overflow-y-auto">
+      <div className="flex flex-col justify-center items-center space-y-4 p-8 h-full text-muted-foreground text-center">
+        <div className="flex justify-center items-center bg-secondary/50 mb-2 rounded-2xl w-16 h-16">
+          <Bot className="opacity-50 w-8 h-8" />
+        </div>
+      <div>
+        <h4 className="mb-1 font-medium text-foreground">Halo, Bapak/Ibu Guru!</h4>
+        <p className="mx-auto max-w-60 text-sm">
+            Saya adalah asisten AI yang siap membantu Anda dalam berbagai informasi pendidikan dan administrasi sekolah.
+        </p>
+      </div>
+      <div className="gap-2 grid grid-cols-1 w-full max-w-xs text-xs">
+        <button
+          type="button"
+          onClick={() =>
+            onSuggestionClick("Buatkan rencana pembelajaran untuk topik Matematika kelas 11")
+          }
+          className="bg-card hover:bg-secondary/50 p-2 border border-border rounded-lg text-left transition-colors"
+        >
+          "Buatkan RPP Matematika kelas 11"
+        </button>
+        <button
+          type="button"
+          onClick={() => onSuggestionClick("Bagaimana cara meningkatkan motivasi siswa yang rendah?")}
+          className="bg-card hover:bg-secondary/50 p-2 border border-border rounded-lg text-left transition-colors"
+        >
+          "Tips motivasi siswa"
+        </button>
+        <button
+          type="button"
+          onClick={() => onSuggestionClick("Siapa siswa yang tidak hadir kemarin?")}
+          className="bg-card hover:bg-secondary/50 p-2 border border-border rounded-lg text-left transition-colors"
+        >
+          "Siapa siswa yang tidak hadir kemarin?"
+        </button>
+        <button
+          type="button"
+          onClick={() => onSuggestionClick("Cari siswa bernama dinda dan tampilkan detailnya")}
+          className="bg-card hover:bg-secondary/50 p-2 border border-border rounded-lg text-left transition-colors"
+        >
+          "Cari siswa bernama dinda"
+        </button>
+      </div>
+      </div>
+    </div>
+  );
+}
