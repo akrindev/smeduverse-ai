@@ -2,7 +2,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { MemorySaver, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode, toolsCondition } from "@langchain/langgraph/prebuilt";
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";
-import { getSystemPrompt } from "../prompts/system";
+import { getSystemPrompt } from "../prompts/system.js";
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || "";
 const MCP_SERVER_URL = process.env.MCP_SERVER_URL || "http://localhost:2222/mcp/smeduverse";
