@@ -122,7 +122,7 @@ export function SmeduverseAIWidget({
       {/* Chat Window */}
       <div
         className={cn(
-          "flex flex-col bg-card shadow-2xl border border-border rounded-2xl overflow-hidden",
+          "flex flex-col bg-white dark:bg-gray-900 shadow-2xl border border-border rounded-2xl overflow-hidden",
           "max-w-[calc(100vw-1rem)] max-h-[calc(100vh-6rem)]",
           "transition-all duration-200 ease-out origin-bottom-right",
           isOpen
