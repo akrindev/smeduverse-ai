@@ -18,11 +18,24 @@ const isVercel = process.env.VERCEL === "1";
 // Create Hono app
 const app = new Hono();
 
-// Add CORS middleware
+const allowedBaseDomain = "smkdiponegoropekalongan.sch.id";
+
+// Add CORS middleware with explicit allowlist
 app.use(
   "/*",
   cors({
-    origin: (origin) => origin,
+    origin: (origin) => {
+      if (!origin) return null;
+      try {
+        const hostname = new URL(origin).hostname;
+        // Allow apex domain and any subdomain of smkdiponegoropekalongan.sch.id
+        return hostname === allowedBaseDomain || hostname.endsWith(`.${allowedBaseDomain}`)
+          ? origin
+          : null;
+      } catch {
+        return null;
+      }
+    },
     allowMethods: ["POST", "GET", "OPTIONS"],
     allowHeaders: [
       "Content-Type",
