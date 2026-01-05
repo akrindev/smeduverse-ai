@@ -2,11 +2,11 @@ import { createRoot } from "react-dom/client";
 import { SmeduverseAIWidget } from "./components/SmeduverseAIWidget";
 import { ShadowRootProvider } from "./context/ShadowRootContext";
 import {
-  clearStoredToken,
-  fetchMcpKey,
-  getStoredToken,
-  setStoredToken,
-  useMcpKey,
+    clearStoredToken,
+    fetchMcpKey,
+    getStoredToken,
+    setStoredToken,
+    useMcpKey,
 } from "./hooks/useMcpKey";
 import styles from "./styles/index.css?inline";
 
@@ -58,6 +58,13 @@ class SmeduverseAI {
     const mountPoint = document.createElement("div");
     mountPoint.style.height = "100%";
     mountPoint.style.width = "100%";
+    mountPoint.style.position = "fixed";
+    mountPoint.style.top = "0";
+    mountPoint.style.left = "0";
+    mountPoint.style.right = "0";
+    mountPoint.style.bottom = "0";
+    mountPoint.style.pointerEvents = "none";
+    mountPoint.style.zIndex = "99999";
     shadow.appendChild(mountPoint);
 
     // Get MCP key
@@ -132,8 +139,8 @@ if (typeof document !== "undefined") {
 
 // Export for programmatic use
 export {
-  clearStoredToken, fetchMcpKey,
-  getStoredToken,
-  setStoredToken, SmeduverseAI, SmeduverseAIWidget, useMcpKey
+    clearStoredToken, fetchMcpKey,
+    getStoredToken,
+    setStoredToken, SmeduverseAI, SmeduverseAIWidget, useMcpKey
 };
 export default SmeduverseAI;

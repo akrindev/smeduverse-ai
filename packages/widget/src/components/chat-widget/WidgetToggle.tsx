@@ -12,7 +12,7 @@ export function WidgetToggle({ isOpen, setIsOpen }: WidgetToggleProps) {
       type="button"
       onClick={() => setIsOpen(!isOpen)}
       className={cn(
-        "z-50 flex justify-center items-center shadow-2xl rounded-full w-14 h-14 transition-all duration-200",
+        "z-50 flex justify-center items-center shadow-2xl rounded-full w-14 h-14 transition-all duration-200 pointer-events-auto",
         "hover:scale-105 active:scale-95",
         isOpen
           ? "bg-gray-100 dark:bg-gray-800 text-foreground rotate-90"
