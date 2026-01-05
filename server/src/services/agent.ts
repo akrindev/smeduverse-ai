@@ -4,29 +4,32 @@ import { ToolNode, toolsCondition } from "@langchain/langgraph/prebuilt";
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";
 import { getSystemPrompt } from "../prompts/system";
 
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || "";
-const MCP_SERVER_URL = process.env.MCP_SERVER_URL || "http://localhost:2222/mcp/smeduverse";
+// Lazy initialization to avoid module-level crashes in serverless environments
+let model: ChatGoogleGenerativeAI | null = null;
 
-if (!GOOGLE_API_KEY) {
-  console.error("ERROR: GOOGLE_API_KEY environment variable is required");
-  process.exit(1);
+function getModel(): ChatGoogleGenerativeAI {
+  if (!model) {
+    const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || "";
+    
+    if (!GOOGLE_API_KEY) {
+      throw new Error("GOOGLE_API_KEY environment variable is required");
+    }
+
+    model = new ChatGoogleGenerativeAI({
+      model: "gemini-3-flash-preview",
+      apiKey: GOOGLE_API_KEY,
+      maxOutputTokens: 65000,
+      temperature: 0.8,
+      cache: true,
+      maxRetries: 12,
+    });
+  }
+  return model;
 }
 
-// Initialize Gemini model with LangChain
-const model = new ChatGoogleGenerativeAI({
-  model: "gemini-3-flash-preview",
-  apiKey: GOOGLE_API_KEY,
-  maxOutputTokens: 65000,
-  temperature: 0.8,
-  cache: true,
-  maxRetries: 12,
-  // thinkingConfig: {
-  //   includeThoughts: true,
-  //   thinkingLevel: "MEDIUM",
-  // },
-});
-
 export const checkpointer = new MemorySaver();
+
+const MCP_SERVER_URL = process.env.MCP_SERVER_URL || "http://localhost:2222/mcp/smeduverse";
 
 // MCP client cache (initialized per server/key)
 let mcpClient: MultiServerMCPClient | null = null;
@@ -95,9 +98,9 @@ const createCallModel =
 
     // Bind tools if available
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let modelWithTools: any = model;
+    let modelWithTools: any = getModel();
     if (availableTools.length > 0) {
-      modelWithTools = model.bindTools(availableTools);
+      modelWithTools = getModel().bindTools(availableTools);
     }
 
     const response = await modelWithTools.invoke(messagesWithSystem);
