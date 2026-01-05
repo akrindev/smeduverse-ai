@@ -28,6 +28,8 @@ app.use(
       if (!origin) return null;
       try {
         const hostname = new URL(origin).hostname;
+        // Allow localhost for development
+        if (hostname === "localhost" || hostname === "127.0.0.1") return origin;
         // Allow apex domain and any subdomain of smkdiponegoropekalongan.sch.id
         return hostname === allowedBaseDomain || hostname.endsWith(`.${allowedBaseDomain}`)
           ? origin
