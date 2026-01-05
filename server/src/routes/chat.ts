@@ -3,6 +3,7 @@ import { createUIMessageStreamResponse } from "ai";
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
+import { nanoid } from "nanoid";
 import { checkpointer, createGraphWithTools, initializeMCPClient } from "../services/agent";
 
 // Detect if running on Vercel (serverless) or locally (Bun)
@@ -77,7 +78,7 @@ app.post("/api/chat", async (c) => {
 
     const config = {
       configurable: {
-        thread_id: thread_id || crypto.randomUUID(),
+        thread_id: thread_id || nanoid(),
       },
       checkpointer,
     };
