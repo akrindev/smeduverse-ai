@@ -1,7 +1,6 @@
 import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
 import { createUIMessageStreamResponse } from "ai";
 import { Hono } from "hono";
-import { serveStatic } from "hono/bun";
 import { cors } from "hono/cors";
 import { nanoid } from "nanoid";
 import { checkpointer, createGraphWithTools, initializeMCPClient } from "../services/agent";
@@ -56,9 +55,9 @@ app.use(
 
 // Serve static files from dist directory (only in local dev with Bun)
 // On Vercel, static files are served from public/ directory via CDN
-if (!isVercel) {
-  app.use("/cdn/*", serveStatic({ root: "./dist" }));
-}
+// if (!isVercel) {
+//   app.use("/cdn/*", serveStatic({ root: "./dist" }));
+// }
 
 // Health check endpoint
 app.get("/health", (c) => {
