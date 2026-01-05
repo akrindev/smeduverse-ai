@@ -11,7 +11,7 @@
 import { handle } from "hono/vercel";
 import { app } from "../server/src/routes/chat.js";
 
-export const runtime = "edge";
+
 
 // Export the Hono app for Vercel
 // Vercel's Bun runtime expects a default export of the Hono app instance
