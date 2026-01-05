@@ -2,8 +2,7 @@ import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
 import { createUIMessageStreamResponse } from "ai";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { nanoid } from "nanoid";
-import { createGraphWithTools, getCheckpointer, initializeMCPClient } from "../services/agent.js";
+import { checkpointer, createGraphWithTools, initializeMCPClient } from "../services/agent.js";
 
 // Detect if running on Vercel (serverless) or locally (Bun)
 const isVercel = process.env.VERCEL === "1";
@@ -77,9 +76,9 @@ app.post("/api/chat", async (c) => {
 
     const config = {
       configurable: {
-        thread_id: thread_id || nanoid(),
+        thread_id: thread_id || crypto.randomUUID(),
       },
-      checkpointer: getCheckpointer(),
+      checkpointer,
     };
 
     const langchainMessages = await toBaseMessages(messages);
