@@ -25,7 +25,7 @@ app.use(
   "/*",
   cors({
     origin: (origin) => {
-      if (!origin) return null;
+      if (!origin) return origin; // Allow requests with no origin (like mobile apps or curl)
       try {
         const hostname = new URL(origin).hostname;
         // Allow localhost for development
@@ -46,9 +46,8 @@ app.use(
       "Accept",
       "Origin",
       "X-CSRF-Token",
-      "Access-Control-Allow-Origin",
     ],
-    exposeHeaders: ["Content-Length"],
+    exposeHeaders: ["Content-Length", "Content-Type"],
     maxAge: 600,
     credentials: true,
   })
