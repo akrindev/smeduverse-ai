@@ -11,9 +11,9 @@
 import { handle } from "hono/vercel";
 import { app } from "../server/src/routes/chat.js";
 
-export const runtime = process.env.NODE_ENV === "production" ? "edge" : "nodejs";
+export const runtime = "edge";
 
 // Export the Hono app for Vercel
 // Vercel's Bun runtime expects a default export of the Hono app instance
-// We use handle() to adapt Hono to Vercel's Node.js serverless function signature
+// We use handle() to adapt Hono to Vercel's serverless function signature
 export default handle(app);
