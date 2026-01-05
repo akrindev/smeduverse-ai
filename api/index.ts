@@ -8,7 +8,7 @@
  * For Vercel deployment, this file is used as the entry point.
  */
 
-import { app } from "../server/src/routes/chat";
+import { app } from "../server/src/routes/chat.js";
 
 export const runtime = "nodejs" ;
 

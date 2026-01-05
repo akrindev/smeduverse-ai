@@ -2,7 +2,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { MemorySaver, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode, toolsCondition } from "@langchain/langgraph/prebuilt";
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";
-import { getSystemPrompt } from "../prompts/system";
+import { getSystemPrompt } from "../prompts/system.js";
 
 // Lazy initialization to avoid module-level crashes in serverless environments
 let model: ChatGoogleGenerativeAI | null = null;
