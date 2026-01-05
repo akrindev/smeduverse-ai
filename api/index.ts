@@ -8,12 +8,6 @@
  * For Vercel deployment, this file is used as the entry point.
  */
 
-import { handle } from "hono/vercel";
 import { app } from "../server/src/routes/chat.js";
 
-
-
-// Export the Hono app for Vercel
-// Vercel's Bun runtime expects a default export of the Hono app instance
-// We use handle() to adapt Hono to Vercel's serverless function signature
-export default handle(app);
+export default app;
