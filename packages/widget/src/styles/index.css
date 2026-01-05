@@ -41,7 +41,10 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-:root {
+/* Define CSS variables for both regular and shadow DOM */
+:root,
+:host,
+* {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -112,11 +115,31 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    box-sizing: border-box;
   }
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Explicit utilities for Shadow DOM - must be outside @layer */
+.border {
+  border-width: 1px;
+  border-style: solid;
+}
+.border-t {
+  border-top-width: 1px;
+  border-top-style: solid;
+}
+.border-b {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+.border-border {
+  border-color: var(--border);
+}
+.border-primary {
+  border-color: var(--primary);
 }
 
 @keyframes shimmer {

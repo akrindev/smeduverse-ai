@@ -36,12 +36,12 @@ export function ChatInput({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 p-4 border-border border-t">
-      <form onSubmit={onSubmit} className="relative flex items-end gap-2">
+    <div className="bg-white dark:bg-gray-900 px-4 py-4 border-border border-t">
+      <form onSubmit={onSubmit} className="relative flex items-end gap-2.5">
         <button
           type="button"
           onClick={onReset}
-          className="hover:bg-secondary p-2.5 rounded-xl text-muted-foreground hover:text-foreground transition-colors"
+          className="hover:bg-secondary p-2.5 rounded-xl text-muted-foreground hover:text-foreground transition-colors shrink-0"
           title="Mulai Percakapan Baru"
         >
           <RotateCcw className="w-5 h-5" />
@@ -52,7 +52,7 @@ export function ChatInput({
             value={input || ""}
             onChange={handleInputChange}
             placeholder="Ketik pesan Anda..."
-            className="bg-secondary/50 px-4 py-2.5 pr-10 border border-border focus:border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 w-full placeholder:text-muted-foreground text-sm transition-all"
+            className="bg-secondary/50 px-4 py-3 border border-border focus:border-primary rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 w-full placeholder:text-muted-foreground text-sm transition-all"
           />
         </div>
         <button
@@ -65,7 +65,7 @@ export function ChatInput({
           }}
           disabled={!isLoading && !input?.trim()}
           className={cn(
-            "p-2.5 rounded-xl transition-all duration-200",
+            "p-3 rounded-xl transition-all duration-200 shrink-0",
             isLoading
               ? "bg-red-500 text-white shadow-lg shadow-red-500/20 hover:opacity-90 animate-pulse"
               : input?.trim()
@@ -80,7 +80,7 @@ export function ChatInput({
           )}
         </button>
       </form>
-      <div className="mt-2 text-[10px] text-muted-foreground text-center">
+      <div className="mt-3 text-[11px] text-muted-foreground text-center">
         Didukung oleh AI. Mohon verifikasi informasi penting.
       </div>
     </div>

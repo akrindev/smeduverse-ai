@@ -113,7 +113,7 @@ export function SmeduverseAIWidget({
   return (
     <div
       className={cn(
-        "z-99999 fixed flex flex-col gap-4 font-sans",
+        "z-99999 fixed flex flex-col gap-4 font-sans pointer-events-none",
         getPositionClasses(),
         darkMode ? "dark" : "",
       )}
@@ -122,7 +122,7 @@ export function SmeduverseAIWidget({
       {/* Chat Window */}
       <div
         className={cn(
-          "flex flex-col bg-white dark:bg-gray-900 shadow-2xl border border-border rounded-2xl overflow-hidden",
+          "flex flex-col bg-white dark:bg-gray-900 shadow-2xl border border-border rounded-2xl overflow-hidden pointer-events-auto",
           "max-w-[calc(100vw-1rem)] max-h-[calc(100vh-6rem)]",
           "transition-all duration-200 ease-out origin-bottom-right",
           isOpen

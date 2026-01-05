@@ -24,7 +24,7 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
   }, [messages]);
 
   return (
-    <div className="flex-1 space-y-4 bg-gray-50/50 dark:bg-gray-950/50 p-2 overflow-y-auto">
+    <div className="flex-1 space-y-4 bg-gray-50/50 dark:bg-gray-950/50 px-4 py-6 overflow-y-auto">
       <Conversation>
         <ConversationContent>
           {(() => {
