@@ -20,9 +20,6 @@
       "@server/*": [
         "./server/src/*"
       ]
-    },
-    "types": [
-      "bun"
-    ],
+    }
   }
 }
