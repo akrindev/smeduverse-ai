@@ -3,7 +3,7 @@ import { createUIMessageStreamResponse } from "ai";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { nanoid } from "nanoid";
-import { createGraphWithTools, getCheckpointer, initializeMCPClient } from "../services/agent";
+import { createGraphWithTools, getCheckpointer, initializeMCPClient } from "../services/agent.js";
 
 // Detect if running on Vercel (serverless) or locally (Bun)
 const isVercel = process.env.VERCEL === "1";
