@@ -10,6 +10,8 @@
 
 import { app } from "../server/src/routes/chat";
 
+export const config = { runtime: "nodejs" };
+
 // Export the Hono app for Vercel
 // Vercel's Bun runtime expects a default export of the Hono app instance
 export default app;
