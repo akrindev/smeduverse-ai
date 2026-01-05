@@ -27,7 +27,15 @@ function getModel(): ChatGoogleGenerativeAI {
   return model;
 }
 
-export const checkpointer = new MemorySaver();
+// Lazy-initialize checkpointer to avoid module-level instantiation issues in serverless
+let checkpointer: MemorySaver | null = null;
+
+export function getCheckpointer(): MemorySaver {
+  if (!checkpointer) {
+    checkpointer = new MemorySaver();
+  }
+  return checkpointer;
+}
 
 const MCP_SERVER_URL = process.env.MCP_SERVER_URL || "http://localhost:2222/mcp/smeduverse";
 
@@ -118,4 +126,4 @@ export const createGraphWithTools = (availableTools: any[]) =>
       __end__: "__end__",
     })
     .addEdge("tools", "agent")
-    .compile({ checkpointer });
+    .compile({ checkpointer: getCheckpointer() });
