@@ -28,16 +28,9 @@ function getModel(): ChatGoogleGenerativeAI {
 }
 
 // Lazy-initialize checkpointer to avoid module-level instantiation issues in serverless
-let checkpointer: MemorySaver | null = null;
+export const checkpointer = new MemorySaver();
 
-export function getCheckpointer(): MemorySaver {
-  if (!checkpointer) {
-    checkpointer = new MemorySaver();
-  }
-  return checkpointer;
-}
-
-const MCP_SERVER_URL = process.env.MCP_SERVER_URL || "http://localhost:2222/mcp/smeduverse";
+const DEFAULT_MCP_URL = "http://localhost:2222/mcp/smeduverse";
 
 // MCP client cache (initialized per server/key)
 let mcpClient: MultiServerMCPClient | null = null;
@@ -53,7 +46,24 @@ export async function initializeMCPClient(mcpKey?: string) {
       return cachedTools;
     }
 
-    const serverUrl = sanitizeServerUrl(MCP_SERVER_URL);
+    // Determine the MCP server URL
+    let serverUrl = process.env.MCP_SERVER_URL;
+
+    // Optimization: In Vercel/Production, if no URL is explicitly provided, skip connection
+    // This prevents hanging on localhost connections that will never succeed
+    const isProduction = process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
+
+    if (!serverUrl) {
+      if (isProduction) {
+        console.log("No MCP_SERVER_URL provided in production environment. Skipping MCP connection.");
+        cachedTools = [];
+        return cachedTools;
+      }
+      // Only default to localhost in local development
+      serverUrl = DEFAULT_MCP_URL;
+    }
+
+    serverUrl = sanitizeServerUrl(serverUrl);
     console.log(`Connecting to MCP server at ${serverUrl}...`);
 
     // Build MCP server config with optional authentication
@@ -126,4 +136,4 @@ export const createGraphWithTools = (availableTools: any[]) =>
       __end__: "__end__",
     })
     .addEdge("tools", "agent")
-    .compile({ checkpointer: getCheckpointer() });
+    .compile({ checkpointer });
