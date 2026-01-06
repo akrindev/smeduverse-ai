@@ -134,11 +134,9 @@ function getToolDisplayInfo(toolName: string, input: any): string {
   }
 
   // Generic fallback
-  const friendlyName = toolName
-    .replace(/_/g, " ")
-    .replace(/([A-Z])/g, " $1")
-    .trim();
-  return `⚙️ Memproses: ${friendlyName}`;
+  // Generic fallback
+  // For unknown tools, avoid showing technical names to non-tech users
+  return "⚙️ Sedang memproses data...";
 }
 
 function getInputValue(input: any): string {

@@ -122,17 +122,25 @@ export function SmeduverseAIWidget({
       {/* Chat Window */}
       <div
         className={cn(
-          "flex flex-col bg-white dark:bg-gray-900 shadow-2xl border border-border rounded-2xl overflow-hidden pointer-events-auto",
-          "max-w-[calc(100vw-1rem)] max-h-[calc(100vh-6rem)]",
+          "flex flex-col bg-white dark:bg-gray-900 shadow-2xl border border-border overflow-hidden pointer-events-auto",
           "transition-all duration-200 ease-out origin-bottom-right",
+
+          // Mobile Full Screen (when open)
+          isOpen &&
+            "!fixed !inset-0 !z-[100000] !w-full !h-[100dvh] !max-w-none !max-h-none !rounded-none",
+
+          // Desktop Constraints (apply only on md+)
+          "md:!static md:!w-auto md:!h-auto md:!rounded-2xl",
+          "md:max-w-[calc(100vw-1rem)] md:max-h-[calc(100vh-6rem)]",
+
+          // Desktop Dimensions
+          isExpanded && isOpen ? "md:!w-[920px]" : "md:!w-[550px]",
+          isOpen && (isExpanded ? "md:!h-[80vh]" : "md:!h-[600px]"),
+
           isOpen
             ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
-            : "opacity-0 scale-95 translate-y-5 pointer-events-none h-0",
+            : "opacity-0 scale-95 translate-y-5 pointer-events-none h-0"
         )}
-        style={{
-          height: isOpen ? (isExpanded ? "80vh" : "600px") : 0,
-          width: isOpen ? (isExpanded ? "920px" : "550px") : "550px",
-        }}
       >
         {isOpen && (
           <>
