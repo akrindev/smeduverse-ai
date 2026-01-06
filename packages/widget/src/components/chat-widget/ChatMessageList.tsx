@@ -24,9 +24,9 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
   }, [messages]);
 
   return (
-    <div className="flex-1 space-y-4 bg-gray-50/50 dark:bg-gray-950/50 px-4 py-6 overflow-y-auto">
+    <div className="flex-1 space-y-4 bg-gray-50/50 dark:bg-gray-950/50 px-2 py-4 md:px-4 md:py-6 overflow-y-auto">
       <Conversation>
-        <ConversationContent>
+        <ConversationContent className="p-2">
           {(() => {
             const seenToolCallIds = new Set<string>();
             return messages.map((m) => (
@@ -54,7 +54,7 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
                     </div>
                     <div
                       className={cn(
-                        "flex flex-col flex-1 gap-2",
+                        "flex flex-col flex-1 gap-2 overflow-hidden",
                         m.role === "user" ? "items-end" : "items-start"
                       )}
                     >
@@ -64,7 +64,7 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
                             <div
                               key={`${m.role}-${i}`}
                               className={cn(
-                                "shadow-sm p-3 rounded-2xl text-sm leading-relaxed",
+                                "shadow-sm p-3 rounded-2xl text-sm leading-relaxed break-words overflow-x-auto max-w-full",
                                 m.role === "user"
                                   ? "bg-blue-700 text-white rounded-tr-none"
                                   : "bg-card border border-border rounded-tl-none"
@@ -79,7 +79,7 @@ export function ChatMessageList({ messages, isLoading }: ChatMessageListProps) {
                           return (
                             <div
                               key={`${m.id}-reasoning-${i}`}
-                              className="bg-card shadow-sm p-3 border border-border rounded-2xl rounded-tl-none text-sm leading-relaxed"
+                              className="bg-card shadow-sm p-3 border border-border rounded-2xl rounded-tl-none text-sm leading-relaxed break-words overflow-x-auto max-w-full"
                             >
                               <Reasoning>
                                 <ReasoningTrigger />
