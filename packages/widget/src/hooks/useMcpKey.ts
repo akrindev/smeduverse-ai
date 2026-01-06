@@ -2,6 +2,12 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 
 const MCP_STORAGE_KEY = "smeduverse_mcp_token";
+const TOKEN_EXPIRATION_MS = 3 * 60 * 60 * 1000; // 3 hours
+
+interface StoredTokenData {
+  token: string;
+  timestamp: number;
+}
 
 export interface UseMcpKeyOptions {
   endpoint?: string;
@@ -18,19 +24,43 @@ export interface UseMcpKeyResult {
   clearToken: () => void;
 }
 
-// Get token from localStorage
+// Get token from localStorage with expiration check
 export function getStoredToken(): string | null {
   try {
-    return localStorage.getItem(MCP_STORAGE_KEY);
+    const item = localStorage.getItem(MCP_STORAGE_KEY);
+    if (!item) return null;
+
+    try {
+      const parsed = JSON.parse(item) as StoredTokenData;
+      // Check if it matches our expected shape
+      if (parsed && typeof parsed === 'object' && parsed.token && typeof parsed.timestamp === 'number') {
+        const now = Date.now();
+        // Check if token is still valid
+        if (now - parsed.timestamp < TOKEN_EXPIRATION_MS) {
+          return parsed.token;
+        }
+      }
+    } catch {
+      // If JSON parse fails, it might be a legacy raw string token.
+      // We treat legacy tokens as expired since we don't know their age.
+    }
+
+    // Token is expired, invalid, or legacy format - clear it
+    localStorage.removeItem(MCP_STORAGE_KEY);
+    return null;
   } catch {
     return null;
   }
 }
 
-// Save token to localStorage
+// Save token to localStorage with timestamp
 export function setStoredToken(token: string): void {
   try {
-    localStorage.setItem(MCP_STORAGE_KEY, token);
+    const data: StoredTokenData = {
+      token,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(MCP_STORAGE_KEY, JSON.stringify(data));
   } catch {
     // Ignore storage errors
   }
