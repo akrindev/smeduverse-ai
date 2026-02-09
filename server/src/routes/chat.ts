@@ -2,6 +2,7 @@ import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
 import { createUIMessageStreamResponse } from "ai";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { serveStatic } from "hono/bun";
 import { checkpointer, createGraphWithTools, initializeMCPClient } from "../services/agent.js";
 
 // Detect if running on Vercel (serverless) or locally (Bun)
@@ -107,6 +108,9 @@ app.post("/api/chat", async (c) => {
     );
   }
 });
+
+// Serve static files from dist directory (for dev environment)
+app.use("/*", serveStatic({ root: "./dist" }));
 
 // Export the Hono app
 // - For Vercel: exports the app instance directly (used via api/index.ts)

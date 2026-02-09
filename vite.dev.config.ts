@@ -19,6 +19,12 @@ export default defineConfig({
 		},
 	},
 	root: ".",
+	server: {
+		middlewareMode: false,
+		fs: {
+			allow: [".", "dist"],
+		},
+	},
 	build: {
 		outDir: "dist",
 		emptyOutDir: false,
