@@ -20,33 +20,52 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
       <div className="gap-2.5 grid grid-cols-1 w-full max-w-sm text-sm">
         <button
           type="button"
-          onClick={() =>
-            onSuggestionClick("Buatkan rencana pembelajaran untuk topik Matematika kelas 11")
-          }
+          onClick={() => onSuggestionClick("Tampilkan statistik ringkas sekolah saat ini")}
           className="bg-white hover:bg-secondary/50 dark:bg-gray-900 px-4 py-3 border border-border rounded-lg text-left transition-colors"
         >
-          "Buatkan RPP Matematika kelas 11"
+          "Statistik sekolah"
         </button>
         <button
           type="button"
-          onClick={() => onSuggestionClick("Bagaimana cara meningkatkan motivasi siswa yang rendah?")}
+          onClick={() => onSuggestionClick("Siapa saja siswa yang tidak hadir pada KBM hari ini?")}
           className="bg-card hover:bg-secondary/50 px-4 py-3 border border-border rounded-lg text-left transition-colors"
         >
-          "Tips motivasi siswa"
+          "Siswa tidak hadir hari ini"
         </button>
         <button
           type="button"
-          onClick={() => onSuggestionClick("Siapa siswa yang tidak hadir kemarin?")}
+          onClick={() => onSuggestionClick("Cari siswa bernama dinda dan tampilkan profil lengkapnya")}
           className="bg-card hover:bg-secondary/50 px-4 py-3 border border-border rounded-lg text-left transition-colors"
         >
-          "Siapa siswa yang tidak hadir kemarin?"
+          "Cari detail siswa"
         </button>
         <button
           type="button"
-          onClick={() => onSuggestionClick("Cari siswa bernama dinda dan tampilkan detailnya")}
+          onClick={() => onSuggestionClick("Cari guru bernama sari dan tampilkan profil lengkapnya")}
           className="bg-card hover:bg-secondary/50 px-4 py-3 border border-border rounded-lg text-left transition-colors"
         >
-          "Cari siswa bernama dinda"
+          "Cari detail guru/staff"
+        </button>
+        <button
+          type="button"
+          onClick={() => onSuggestionClick("Tampilkan agenda dan kegiatan sekolah minggu ini")}
+          className="bg-card hover:bg-secondary/50 px-4 py-3 border border-border rounded-lg text-left transition-colors"
+        >
+          "Agenda sekolah minggu ini"
+        </button>
+        <button
+          type="button"
+          onClick={() => onSuggestionClick("Tampilkan rekap kehadiran staff bulan ini beserta yang sering terlambat")}
+          className="bg-card hover:bg-secondary/50 px-4 py-3 border border-border rounded-lg text-left transition-colors"
+        >
+          "Rekap kehadiran staff"
+        </button>
+        <button
+          type="button"
+          onClick={() => onSuggestionClick("Tampilkan daftar tugas modul yang belum dikumpulkan siswa")}
+          className="bg-card hover:bg-secondary/50 px-4 py-3 border border-border rounded-lg text-left transition-colors"
+        >
+          "Tugas yang belum dikumpulkan"
         </button>
       </div>
       </div>
