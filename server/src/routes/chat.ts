@@ -18,27 +18,21 @@ const isVercel = process.env.VERCEL === "1";
 // Create Hono app
 const app = new Hono();
 
-const allowedBaseDomain = "smkdiponegoropekalongan.sch.id";
-
 // Add CORS middleware with explicit allowlist
 app.use(
   "/*",
   cors({
-    origin: (origin) => {
-      if (!origin) return origin; // Allow requests with no origin (like mobile apps or curl)
-      try {
-        const hostname = new URL(origin).hostname;
-        // Allow localhost for development
-        if (hostname === "localhost" || hostname === "127.0.0.1") return origin;
-        // Allow apex domain and any subdomain of smkdiponegoropekalongan.sch.id
-        return hostname === allowedBaseDomain || hostname.endsWith(`.${allowedBaseDomain}`)
-          ? origin
-          : null;
-      } catch {
-        return null;
-      }
-    },
-    allowMethods: ["POST", "GET", "OPTIONS"],
+    origin: [
+      "https://smkdiponegoropekalongan.sch.id",
+      "https://ai.smkdiponegoropekalongan.sch.id",
+      "https://smeduverse.smkdiponegoropekalongan.sch.id",
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "http://localhost:8080",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:5173",
+    ],
+    allowMethods: ["GET", "POST", "OPTIONS"],
     allowHeaders: [
       "Content-Type",
       "Authorization",
@@ -46,9 +40,11 @@ app.use(
       "Accept",
       "Origin",
       "X-CSRF-Token",
+      "Cache-Control",
+      "Pragma",
     ],
     exposeHeaders: ["Content-Length", "Content-Type"],
-    maxAge: 600,
+    maxAge: 86400,
     credentials: true,
   })
 );
