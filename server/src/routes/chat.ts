@@ -2,7 +2,6 @@ import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
 import { createUIMessageStreamResponse } from "ai";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { serveStatic } from "hono/bun";
 import { checkpointer, createGraphWithTools, initializeMCPClient } from "../services/agent.js";
 
 // Detect if running on Vercel (serverless) or locally (Bun)
@@ -49,15 +48,13 @@ app.use(
   })
 );
 
-// Serve static files from dist directory (only in local dev with Bun)
-// On Vercel, static files are served from public/ directory via CDN
-// if (!isVercel) {
-//   app.use("/cdn/*", serveStatic({ root: "./dist" }));
-// }
-
 // Health check endpoint
 app.get("/health", (c) => {
   return c.json({ status: "ok" });
+});
+
+app.options("/api/chat", (c) => {
+  return c.body(null, 204);
 });
 
 app.post("/api/chat", async (c) => {
@@ -104,9 +101,6 @@ app.post("/api/chat", async (c) => {
     );
   }
 });
-
-// Serve static files from dist directory (for dev environment)
-app.use("/*", serveStatic({ root: "./dist" }));
 
 // Export the Hono app
 // - For Vercel: exports the app instance directly (used via api/index.ts)
