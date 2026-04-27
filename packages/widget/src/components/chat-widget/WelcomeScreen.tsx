@@ -12,19 +12,12 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
           <Bot className="opacity-50 w-8 h-8" />
         </div>
       <div className="space-y-2">
-        <h4 className="font-medium text-foreground text-lg">Halo, Bapak/Ibu Guru!</h4>
+        <h4 className="font-medium text-foreground text-lg">Halo, Bapak/Ibu Guru dan Staff Tenaga Kependidikan!</h4>
         <p className="mx-auto max-w-md text-sm leading-relaxed">
             Saya adalah asisten AI yang siap membantu Anda dalam berbagai informasi pendidikan dan administrasi sekolah.
         </p>
       </div>
       <div className="gap-2.5 grid grid-cols-1 w-full max-w-sm text-sm">
-        <button
-          type="button"
-          onClick={() => onSuggestionClick("Tampilkan statistik ringkas sekolah saat ini")}
-          className="bg-white hover:bg-secondary/50 dark:bg-gray-900 px-4 py-3 border border-border rounded-lg text-left transition-colors"
-        >
-          "Statistik sekolah"
-        </button>
         <button
           type="button"
           onClick={() => onSuggestionClick("Siapa saja siswa yang tidak hadir pada KBM hari ini?")}
@@ -41,17 +34,10 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
         </button>
         <button
           type="button"
-          onClick={() => onSuggestionClick("Cari guru bernama sari dan tampilkan profil lengkapnya")}
+          onClick={() => onSuggestionClick("Cari guru bernama syafinda dan tampilkan profil lengkapnya")}
           className="bg-card hover:bg-secondary/50 px-4 py-3 border border-border rounded-lg text-left transition-colors"
         >
           "Cari detail guru/staff"
-        </button>
-        <button
-          type="button"
-          onClick={() => onSuggestionClick("Tampilkan agenda dan kegiatan sekolah minggu ini")}
-          className="bg-card hover:bg-secondary/50 px-4 py-3 border border-border rounded-lg text-left transition-colors"
-        >
-          "Agenda sekolah minggu ini"
         </button>
         <button
           type="button"
@@ -59,13 +45,6 @@ export function WelcomeScreen({ onSuggestionClick }: WelcomeScreenProps) {
           className="bg-card hover:bg-secondary/50 px-4 py-3 border border-border rounded-lg text-left transition-colors"
         >
           "Rekap kehadiran staff"
-        </button>
-        <button
-          type="button"
-          onClick={() => onSuggestionClick("Tampilkan daftar tugas modul yang belum dikumpulkan siswa")}
-          className="bg-card hover:bg-secondary/50 px-4 py-3 border border-border rounded-lg text-left transition-colors"
-        >
-          "Tugas yang belum dikumpulkan"
         </button>
       </div>
       </div>
