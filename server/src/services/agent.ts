@@ -11,7 +11,7 @@ function getModel(): ChatOpenAI {
   if (!model) {
     const OPENCODE_API_KEY = process.env.OPENCODE_API_KEY || "";
     const OPENCODE_API_BASE = process.env.OPENCODE_API_BASE || "https://opencode.ai/zen/v1";
-    const OPENCODE_MODEL = process.env.OPENCODE_MODEL || "opencode/mimo-v2.5-free";
+    const OPENCODE_MODEL = process.env.OPENCODE_MODEL || "mimo-v2.5-free";
 
     if (!OPENCODE_API_KEY) {
       throw new Error("OPENCODE_API_KEY environment variable is required");
