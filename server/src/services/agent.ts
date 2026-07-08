@@ -108,8 +108,8 @@ export async function initializeMCPClient(mcpKey?: string) {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const createCallModel =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (availableTools: any[]) => async (state: typeof MessagesAnnotation.State) => {
     const systemMessage = {
       role: "system" as const,
