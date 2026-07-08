@@ -1,26 +1,29 @@
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatOpenAI } from "@langchain/openai";
 import { MemorySaver, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode, toolsCondition } from "@langchain/langgraph/prebuilt";
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";
 import { getSystemPrompt } from "../prompts/system.js";
 
 // Lazy initialization to avoid module-level crashes in serverless environments
-let model: ChatGoogleGenerativeAI | null = null;
+let model: ChatOpenAI | null = null;
 
-function getModel(): ChatGoogleGenerativeAI {
+function getModel(): ChatOpenAI {
   if (!model) {
-    const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || "";
-    
-    if (!GOOGLE_API_KEY) {
-      throw new Error("GOOGLE_API_KEY environment variable is required");
+    const OPENCODE_API_KEY = process.env.OPENCODE_API_KEY || "";
+    const OPENCODE_API_BASE = process.env.OPENCODE_API_BASE || "https://opencode.ai/zen/v1";
+    const OPENCODE_MODEL = process.env.OPENCODE_MODEL || "opencode/mimo-v2.5-free";
+
+    if (!OPENCODE_API_KEY) {
+      throw new Error("OPENCODE_API_KEY environment variable is required");
     }
 
-    model = new ChatGoogleGenerativeAI({
-      model: "gemini-3-flash-preview",
-      apiKey: GOOGLE_API_KEY,
-      maxOutputTokens: 65000,
+    model = new ChatOpenAI({
+      model: OPENCODE_MODEL,
+      apiKey: OPENCODE_API_KEY,
+      configuration: {
+        baseURL: OPENCODE_API_BASE,
+      },
       temperature: 0.8,
-      cache: true,
       maxRetries: 12,
     });
   }
